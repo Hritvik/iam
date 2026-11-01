@@ -374,6 +374,8 @@ These work items descend from the [Identity Platform Foundation through Dutch On
 
 **Type.** AFK.
 
+**Status.** Rejected — mis-scoped duplicate. The `/api/v1/me` and `/api/v1/me/profile-state` surfaces are Dutch UMS work (`dutch-ref/W12-A/B`, UMS W-7); IAM already supplies the auth, token and onboarding facts. No IAM code change remains for this item.
+
 **Work to be done.**
 - Add the authenticated profile-state query.
 - Gate the profile resource on committed readiness.
@@ -427,7 +429,7 @@ These work items descend from the [Identity Platform Foundation through Dutch On
 - [ ] Another app cannot read Dutch snapshot data or receive a correlatable Dutch subject.
 - [ ] Every successful journey reaches `PROFILE_READY` with one profile and no privacy canary outside IAM.
 
-**Depends on.** W-2, W-9, W-11, W-12; `ums/W-18` (real Dutch consumer journey) and the UMS Slice C provider gates. Reference-adapter tests do not close this item.
+**Depends on.** W-2, W-9, W-11; `ums/W-18` (real Dutch consumer journey) and the UMS Slice C provider gates. Reference-adapter tests do not close this item. The retired W-12 was a duplicate of Dutch W-12/UMS W-7.
 
 ## W-14 — Assemble development-milestone evidence and reviews
 
@@ -460,7 +462,7 @@ These work items descend from the [Identity Platform Foundation through Dutch On
 - [ ] The handoff lists changed files, exact commands and results, and remaining gaps, and labels the result a “development proving milestone.”
 - [ ] No commit, push, registry publication, or cloud selection occurs.
 
-**Depends on.** W-1, W-2, W-3, W-4, W-5, W-6, W-7, W-8, W-9, W-10, W-11, W-12, W-13.
+**Depends on.** W-1, W-2, W-3, W-4, W-5, W-6, W-7, W-8, W-9, W-10, W-11, W-13. The retired W-12 was a duplicate of Dutch W-12/UMS W-7.
 
 ## Named gaps
 
