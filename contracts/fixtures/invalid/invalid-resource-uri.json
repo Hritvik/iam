@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/oauth/protected-resource-metadata.schema.json","assertedReason":"uri","instance":{"resource":"not a uri","authorization_servers":["https://iam.distracted.invalid"],"scopes_supported":["member:read"],"bearer_methods_supported":["header"],"resource_signing_alg_values_supported":["ES256"]}}

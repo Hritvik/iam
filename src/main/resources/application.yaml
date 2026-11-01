@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: iam
+  flyway:
+    enabled: true
+  threads:
+    virtual:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+

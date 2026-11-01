@@ -1,0 +1,80 @@
+name: distracted-identity-platform-contracts
+version: 1.0.0
+contracts:
+  - name: app-registration
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: manifest/app-registration.schema.json
+  - name: dutch-development-app-registration-example
+    kind: example
+    schemaVersion: 1.0.0
+    path: manifest/dutch-development.app-registration.json
+    schema: https://contracts.distracted.dev/iam/manifest/app-registration.schema.json
+  - name: product-security-policy
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: manifest/product-security-policy.schema.json
+  - name: human-access-token-header
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/human-access-token-header.schema.json
+  - name: authorization-server-metadata
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/authorization-server-metadata.schema.json
+  - name: jwks
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/jwks.schema.json
+  - name: protected-resource-metadata
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/protected-resource-metadata.schema.json
+  - name: human-access-token-claims
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/human-access-token-claims.schema.json
+  - name: dpop-proof-header
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/dpop-proof-header.schema.json
+  - name: token-endpoint-dpop-proof-claims
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/dpop-proof-claims.schema.json
+  - name: dpop-token-response
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/token-response.schema.json
+  - name: oauth-token-error-response
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/token-error-response.schema.json
+  - name: onboarding-snapshot-response
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: http/onboarding-snapshot-response.schema.json
+  - name: error-envelope
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: http/error-envelope.schema.json
+  - name: onboarding-snapshot
+    kind: openapi
+    schemaVersion: 1.0.0
+    path: http/iam-onboarding-snapshot.openapi.yaml
+  - name: event-envelope
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: events/event-envelope.schema.json
+  - name: iam.app-subject.onboarding-ready.v1
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: events/iam.app-subject.onboarding-ready.v1.schema.json
+  - name: iam.app-subject.onboarding-ready.v1-payload
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: events/iam.app-subject.onboarding-ready.v1.payload.schema.json
+  - name: semantic-conformance-requirements
+    kind: requirements
+    schemaVersion: 1.0.0
+    path: conformance/semantic-requirements.yaml

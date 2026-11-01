@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.distracted.dev/iam/oauth/authorization-server-metadata.schema.json",
+  "title": "Authorization Server Metadata v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["issuer", "authorization_endpoint", "token_endpoint", "jwks_uri", "response_types_supported", "grant_types_supported", "code_challenge_methods_supported", "token_endpoint_auth_methods_supported", "dpop_signing_alg_values_supported"],
+  "properties": {
+    "issuer": {"type": "string", "format": "uri", "pattern": "^https://", "maxLength": 256},
+    "authorization_endpoint": {"type": "string", "format": "uri", "pattern": "^https://", "maxLength": 512},
+    "token_endpoint": {"type": "string", "format": "uri", "pattern": "^https://", "maxLength": 512},
+    "jwks_uri": {"type": "string", "format": "uri", "pattern": "^https://", "maxLength": 512},
+    "response_types_supported": {"type": "array", "minItems": 1, "maxItems": 1, "prefixItems": [{"const": "code"}], "items": false},
+    "grant_types_supported": {"type": "array", "minItems": 1, "maxItems": 1, "prefixItems": [{"const": "authorization_code"}], "items": false},
+    "code_challenge_methods_supported": {"type": "array", "minItems": 1, "maxItems": 1, "prefixItems": [{"const": "S256"}], "items": false},
+    "token_endpoint_auth_methods_supported": {"type": "array", "minItems": 1, "maxItems": 1, "prefixItems": [{"const": "none"}], "items": false},
+    "dpop_signing_alg_values_supported": {"type": "array", "minItems": 1, "maxItems": 1, "prefixItems": [{"const": "ES256"}], "items": false}
+  }
+}

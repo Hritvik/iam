@@ -1,0 +1,11 @@
+package dev.distracted.iam.platform.crypto;
+
+public enum CapabilityPurpose {
+    ACCESS_TOKEN_SIGNING,
+    IDENTIFIER_ENCRYPTION,
+    IDENTIFIER_BLIND_INDEX,
+    VERIFICATION_CHALLENGE_DIGEST,
+    AUTHORIZATION_CODE_DIGEST,
+    DPOP_STATE_DIGEST
+}
+

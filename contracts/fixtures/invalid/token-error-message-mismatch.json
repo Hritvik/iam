@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/oauth/token-error-response.schema.json","assertedReason":"one and only one","instance":{"error":"invalid_grant","error_description":"DPoP proof is invalid","correlation_id":"correlation-001"}}

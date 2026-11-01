@@ -1,0 +1,366 @@
+{
+  "schema_version": 1,
+  "revision": 25,
+  "project": "IAM W-9 onboarding relay and app-scoped snapshot",
+  "source_plan": "../../work-items.md#W-9",
+  "review_threshold": "medium",
+  "parent_status": "accepted",
+  "parent_acceptance_packet": "W09-F",
+  "repository_root_up": 5,
+  "lock_stale_after_seconds": 1800,
+  "claim_stale_after_seconds": 1800,
+  "execution_leases": {},
+  "packets": [
+    {
+      "id": "W09-A",
+      "title": "Relay onboarding with durable leases",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W09-A.md",
+      "evidence": "evidence/W09-A.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/messaging/relay/OnboardingRelay.java",
+        "src/main/java/dev/distracted/iam/messaging/relay/OutboxTransport.java",
+        "src/main/java/dev/distracted/iam/messaging/relay/RelaySettings.java",
+        "src/main/java/dev/distracted/iam/messaging/relay/OutboxRelayRepository.java",
+        "src/main/java/dev/distracted/iam/messaging/relay/adapter/jdbc/JdbcOutboxRelayRepository.java",
+        "src/main/java/dev/distracted/iam/messaging/relay/RelayOutcome.java",
+        "src/test/java/dev/distracted/iam/messaging/relay/OnboardingRelayTest.java",
+        "src/integrationTest/java/dev/distracted/iam/messaging/relay/OutboxRelayPersistenceIntegrationTest.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T17:41:56Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-11",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T17:41:56Z",
+          "evidence": "evidence/W09-A-review.md",
+          "evidence_sha256": "05fca577167ee57135d889bf05171050d49ed77e567118b9af6898010a898fc7"
+        }
+      ],
+      "central": {
+        "task": "iam/W09-A",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W09-B",
+      "title": "Serve the authenticated app-scoped snapshot",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W09-B.md",
+      "evidence": "evidence/W09-B.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/resources/db/migration/V12__onboarding_snapshot.sql",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/OnboardingSnapshotQuery.java",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/OnboardingSnapshotPage.java",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/OnboardingSnapshotItem.java",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/adapter/jdbc/JdbcOnboardingSnapshotQuery.java",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/web/OnboardingSnapshotController.java",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/web/WorkloadPrincipal.java",
+        "src/test/java/dev/distracted/iam/messaging/snapshot/OnboardingSnapshotTest.java",
+        "src/test/java/dev/distracted/iam/messaging/snapshot/web/OnboardingSnapshotHttpTest.java",
+        "src/integrationTest/java/dev/distracted/iam/messaging/snapshot/OnboardingSnapshotPersistenceIntegrationTest.java",
+        "src/main/java/dev/distracted/iam/messaging/snapshot/web/WorkloadAuthenticator.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T17:41:56Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-11",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T17:41:56Z",
+          "evidence": "evidence/W09-B-review.md",
+          "evidence_sha256": "16880dd2d4c68ab8d10bba9fd721a13eecca5e885624b53d3818738ce16d03c8"
+        }
+      ],
+      "central": {
+        "task": "iam/W09-B",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W09-C",
+      "title": "Prove relay and snapshot together",
+      "kind": "integration",
+      "status": "integrated",
+      "packet": "packets/W09-C.md",
+      "evidence": "evidence/W09-C.md",
+      "depends_on": [
+        "W09-A",
+        "W09-B"
+      ],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/integrationTest/java/dev/distracted/iam/messaging/OnboardingProducerIntegrationTest.java",
+        "src/main/java/dev/distracted/iam/messaging/MessagingApplicationConfiguration.java",
+        "docs/identity-platform/wayfinder/artifacts/work-item-09-red-green.md"
+      ],
+      "shared_paths": [
+        "build/**"
+      ],
+      "lock_groups": [
+        "gradle-build"
+      ],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T17:47:23Z",
+        "summary": "Integration gates passed",
+        "next_action": "Promote independent review packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W09-A-review.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "integration_revision": 13,
+      "evidence_sha256": "a34f9b8f273ab0036ee03374e26b55f2044746b6e016bef5b08cceb4aa07d20a",
+      "central": {
+        "task": "iam/W09-C",
+        "revision": 0,
+        "status": "integrated",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W09-RC",
+      "title": "Independent correctness and database review",
+      "kind": "review",
+      "status": "accepted",
+      "packet": "packets/W09-RC.md",
+      "evidence": "evidence/W09-RC.md",
+      "depends_on": [
+        "W09-C"
+      ],
+      "dependency_gate": "integrated",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/agent-work/w09/evidence/W09-RC.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T18:20:00Z",
+        "summary": "Independent review accepted",
+        "next_action": "Await other reviews or accept parent",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "REVIEWER-12",
+          "evidence": "evidence/W09-C.md"
+        }
+      ],
+      "implementation_agent": "REVIEWER-12",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-12",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T18:20:00Z",
+          "evidence": "evidence/W09-RC.md",
+          "evidence_sha256": "7c84e776247796ac1503812e24c5b9051b0417ce98de6c0cc636e96e378e59a7"
+        }
+      ],
+      "accepted_bindings": [
+        {
+          "packet_id": "W09-C",
+          "integration_revision": 13,
+          "evidence_sha256": "a34f9b8f273ab0036ee03374e26b55f2044746b6e016bef5b08cceb4aa07d20a"
+        }
+      ],
+      "central": {
+        "task": "iam/W09-RC",
+        "revision": 0,
+        "status": "accepted",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W09-RS",
+      "title": "Independent security and privacy review",
+      "kind": "review",
+      "status": "accepted",
+      "packet": "packets/W09-RS.md",
+      "evidence": "evidence/W09-RS.md",
+      "depends_on": [
+        "W09-C"
+      ],
+      "dependency_gate": "integrated",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/agent-work/w09/evidence/W09-RS.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T18:20:00Z",
+        "summary": "Independent review accepted",
+        "next_action": "Await other reviews or accept parent",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "REVIEWER-12",
+          "evidence": "evidence/W09-C.md"
+        }
+      ],
+      "implementation_agent": "REVIEWER-12",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-12",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T18:20:00Z",
+          "evidence": "evidence/W09-RS.md",
+          "evidence_sha256": "e9833c9da437918e7a3f07ff0a667364c13a8f57762f2aa6e523f19c5354f6c3"
+        }
+      ],
+      "accepted_bindings": [
+        {
+          "packet_id": "W09-C",
+          "integration_revision": 13,
+          "evidence_sha256": "a34f9b8f273ab0036ee03374e26b55f2044746b6e016bef5b08cceb4aa07d20a"
+        }
+      ],
+      "central": {
+        "task": "iam/W09-RS",
+        "revision": 0,
+        "status": "accepted",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W09-F",
+      "title": "Finalize accepted W-9 status",
+      "kind": "integration",
+      "status": "integrated",
+      "packet": "packets/W09-F.md",
+      "evidence": "evidence/W09-F.md",
+      "depends_on": [
+        "W09-RC",
+        "W09-RS"
+      ],
+      "dependency_gate": "accepted",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/work-items.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T18:20:10Z",
+        "summary": "Integration gates passed",
+        "next_action": "Promote independent review packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W09-RC.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "integration_revision": 24,
+      "evidence_sha256": "23d444c3f6a410740f0e1bfcf15ca57ff298abdb1e5a7c802d04d7bdd5963748",
+      "central": {
+        "task": "iam/W09-F",
+        "revision": 0,
+        "status": "integrated",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    }
+  ],
+  "accepted_by": "OPENCODE-DS41F",
+  "central_registry": {
+    "home": "capabilities/work",
+    "board": "iam.w09",
+    "synced_at": "2026-11-01T00:00:00Z"
+  }
+}

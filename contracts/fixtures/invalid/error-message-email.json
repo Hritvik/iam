@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/http/error-envelope.schema.json","assertedReason":"message","instance":{"error":{"code":"invalid_request","message":"person@example.invalid","correlationId":"correlation-001"}}}

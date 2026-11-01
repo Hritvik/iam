@@ -1,0 +1,714 @@
+{
+  "schema_version": 1,
+  "revision": 102,
+  "project": "IAM W-7 native DPoP and durable replay protection",
+  "source_plan": "../../work-items.md#W-7",
+  "review_threshold": "medium",
+  "parent_status": "accepted",
+  "parent_acceptance_packet": "W07-F",
+  "repository_root_up": 5,
+  "lock_stale_after_seconds": 1800,
+  "claim_stale_after_seconds": 1800,
+  "execution_leases": {},
+  "packets": [
+    {
+      "id": "W07-A",
+      "title": "Close DPoP proof and target canonicalization",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W07-A.md",
+      "evidence": "evidence/W07-A.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/dpop/DpopProofVerifier.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopProofValidation.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopProofRejectedException.java",
+        "src/main/java/dev/distracted/iam/dpop/VerifiedDpopProof.java",
+        "src/test/java/dev/distracted/iam/dpop/DpopProofVerifierTest.java",
+        "contracts/oauth/dpop-proof-claims.schema.json",
+        "contracts/oauth/dpop-proof-header.schema.json",
+        "contracts/fixtures/valid/dpop-proof-claims.json",
+        "contracts/fixtures/valid/dpop-proof-header.json",
+        "contracts/fixtures/valid/dpop-nonce-challenge-proof-claims.json",
+        "contracts/fixtures/invalid/dpop-proof-private-jwk.json",
+        "contracts/fixtures/invalid/dpop-proof-short-jti.json",
+        "contracts/fixtures/invalid/dpop-token-proof-ath.json"
+      ],
+      "shared_paths": [
+        "contracts/catalog.yaml",
+        "contracts/conformance/semantic-requirements.yaml"
+      ],
+      "lock_groups": [
+        "contracts-catalog"
+      ],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T05:23:53Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W07-B.md"
+        }
+      ],
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-01",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T04:57:25Z",
+          "evidence": "evidence/W07-A-review1.md",
+          "evidence_sha256": "629a008706e78d5f59c83a88a8bf887aab09fc582e8423c3eebb55f803e57828",
+          "severity": "medium",
+          "finding": "Independent review 01 findings"
+        },
+        {
+          "reviewer": "REVIEWER-02",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T05:23:53Z",
+          "evidence": "evidence/W07-A-review2.md",
+          "evidence_sha256": "cda4f988fa9033d3c7207ed3c30cee23ae91eec93e787cdc390f8400b1bfe4b3"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-A",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-B",
+      "title": "Make nonce and replay state rotation-safe and bounded",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W07-B.md",
+      "evidence": "evidence/W07-B.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/resources/db/migration/V9__dpop_nonce_replay_and_token_issuance.sql",
+        "src/main/java/dev/distracted/iam/dpop/DpopStateStore.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopStateDigestCapability.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopStatePurpose.java",
+        "src/main/java/dev/distracted/iam/dpop/HmacDpopStateDigestCapability.java",
+        "src/main/java/dev/distracted/iam/dpop/ProtectedDpopCandidates.java",
+        "src/main/java/dev/distracted/iam/dpop/ProtectedDpopState.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopChallengeState.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopIssuanceState.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopNonceMaterial.java",
+        "src/main/java/dev/distracted/iam/dpop/SecureDpopNonceGenerator.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopCapabilityProperties.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopProductionCapabilityConfiguration.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopProtectedRequestVerifier.java",
+        "src/main/java/dev/distracted/iam/dpop/VerifiedDpopPrincipal.java",
+        "src/main/java/dev/distracted/iam/dpop/HumanTokenValidation.java",
+        "src/main/java/dev/distracted/iam/dpop/adapter/jdbc/JdbcDpopStateStore.java",
+        "src/test/java/dev/distracted/iam/dpop/DpopProtectedRequestVerifierTest.java",
+        "src/test/java/dev/distracted/iam/dpop/HmacDpopStateDigestCapabilityTest.java",
+        "src/test/java/dev/distracted/iam/dpop/SecureDpopNonceGeneratorTest.java",
+        "src/test/java/dev/distracted/iam/dpop/DpopProductionCapabilityConfigurationTest.java"
+      ],
+      "shared_paths": [
+        "src/integrationTest/java/dev/distracted/iam/dpop/DpopPersistenceIntegrationTest.java"
+      ],
+      "lock_groups": [
+        "dpop-integration"
+      ],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T05:23:54Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-01",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T04:57:25Z",
+          "evidence": "evidence/W07-B-review1.md",
+          "evidence_sha256": "7e7cac5e556e08577fd9d63e7913a09428b4dc1955663609cad1d812fe52cd1e",
+          "severity": "medium",
+          "finding": "Independent review 01 findings"
+        },
+        {
+          "reviewer": "REVIEWER-02",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T05:23:54Z",
+          "evidence": "evidence/W07-B-review2.md",
+          "evidence_sha256": "28486738b3427ac9f1c965d98ced69aa4282b4b2531d69ef26ad22cfdb8673fa"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-B",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-C",
+      "title": "Bound external signing while transactional locks are held",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W07-C.md",
+      "evidence": "evidence/W07-C.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/dpop/DeadlineTokenAccessIssuer.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenAccessIssuer.java",
+        "src/test/java/dev/distracted/iam/dpop/DeadlineTokenAccessIssuerTest.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T05:23:54Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-01",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T04:57:26Z",
+          "evidence": "evidence/W07-C-review1.md",
+          "evidence_sha256": "41c8c40d8275579a8c23b6137f2cfe19746f5a1d98022aa94c9fb3313931d2ef",
+          "severity": "medium",
+          "finding": "Independent review 01 findings"
+        },
+        {
+          "reviewer": "REVIEWER-02",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T05:23:54Z",
+          "evidence": "evidence/W07-C-review2.md",
+          "evidence_sha256": "af26669f7a278f95d75e617826123c27acebb1e003f964a5fb445a721e5a767e"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-C",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-D",
+      "title": "Close rate-limit, correlation, and diagnostic privacy boundaries",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W07-D.md",
+      "evidence": "evidence/W07-D.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/dpop/TokenEndpointRateLimiter.java",
+        "src/main/java/dev/distracted/iam/dpop/ExternalTokenEndpointRateLimiter.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenRateLimitRequest.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenRateLimitCategory.java",
+        "src/main/java/dev/distracted/iam/dpop/BoundedLocalTokenEndpointRateLimiter.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopProductionRateLimitConfiguration.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenEndpointCommand.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenEndpointOutcome.java",
+        "src/main/java/dev/distracted/iam/dpop/web/DpopTokenEndpointSecurityConfiguration.java",
+        "src/main/java/dev/distracted/iam/dpop/web/DpopNonceRequiredException.java",
+        "src/main/java/dev/distracted/iam/dpop/web/DpopTokenRequestAuthenticationConverter.java",
+        "src/main/java/dev/distracted/iam/dpop/web/DpopTokenRequestAuthenticationProvider.java",
+        "src/main/java/dev/distracted/iam/dpop/web/DpopTokenRequestAuthenticationToken.java",
+        "src/test/java/dev/distracted/iam/dpop/BoundedLocalTokenEndpointRateLimiterTest.java",
+        "src/test/java/dev/distracted/iam/dpop/DpopProductionRateLimitConfigurationTest.java",
+        "src/test/java/dev/distracted/iam/dpop/web/DpopTokenEndpointHttpTest.java",
+        "src/test/java/dev/distracted/iam/dpop/web/DpopTokenRequestAuthenticationConverterTest.java",
+        "contracts/oauth/token-response.schema.json",
+        "contracts/oauth/token-error-response.schema.json",
+        "contracts/fixtures/valid/token-response.json",
+        "contracts/fixtures/valid/token-error-response.json",
+        "contracts/fixtures/invalid/token-response-refresh-token.json",
+        "contracts/fixtures/invalid/token-error-message-mismatch.json"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T05:23:55Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-01",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T04:57:26Z",
+          "evidence": "evidence/W07-D-review1.md",
+          "evidence_sha256": "3f9e5943a35ff857f0dc9742902cc823e265239a7d9e102bc6c80d2ae86f4538",
+          "severity": "medium",
+          "finding": "Independent review 01 findings"
+        },
+        {
+          "reviewer": "REVIEWER-02",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T05:23:55Z",
+          "evidence": "evidence/W07-D-review2.md",
+          "evidence_sha256": "b2684925a5d578a31ec37e1e86952c51b9b31cd2c40c99297c678a71a491e45a"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-D",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-E",
+      "title": "Compose rollback-safe token issuance",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W07-E.md",
+      "evidence": "evidence/W07-E.md",
+      "depends_on": [
+        "W07-E2"
+      ],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/dpop/DefaultTokenEndpointOrchestrator.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopApplicationConfiguration.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenAuthorizationRedeemer.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenEndpointOrchestrator.java",
+        "src/main/java/dev/distracted/iam/dpop/TokenSubjectResolver.java",
+        "src/test/java/dev/distracted/iam/dpop/DefaultTokenEndpointOrchestratorTest.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T06:21:21Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W07-A-review2.md"
+        },
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W07-E2-review2.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-03",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T05:33:07Z",
+          "evidence": "evidence/W07-E-review1.md",
+          "evidence_sha256": "7a828c9efbd7fa30610ad5f418e73e29959ee03e4ab382872f67950f5dbb1065",
+          "severity": "critical",
+          "finding": "signer worker self-deadlocks on identity row lock"
+        },
+        {
+          "reviewer": "REVIEWER-04",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T05:39:26Z",
+          "evidence": "evidence/W07-E-review2.md",
+          "evidence_sha256": "9efa5c8027c75636d35afc31cd999a127fcd505629b54c9162396d222f36ca81",
+          "severity": "high",
+          "finding": "worker still queries registration on a second pooled connection"
+        },
+        {
+          "reviewer": "REVIEWER-06",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T06:21:21Z",
+          "evidence": "evidence/W07-E-review3.md",
+          "evidence_sha256": "b530b7eed3e24aa07927cc54465a741e021d6de3f373c4ba3c2b7ee29ce63893"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-E",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-E2",
+      "title": "Remove worker-thread database access from token issuance",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W07-E2.md",
+      "evidence": "evidence/W07-E2.md",
+      "depends_on": [
+        "W07-B",
+        "W07-C"
+      ],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/dpop/TokenAccessIssuer.java",
+        "src/main/java/dev/distracted/iam/dpop/DeadlineTokenAccessIssuer.java",
+        "src/main/java/dev/distracted/iam/dpop/DefaultTokenEndpointOrchestrator.java",
+        "src/main/java/dev/distracted/iam/dpop/DpopApplicationConfiguration.java",
+        "src/main/java/dev/distracted/iam/token/HumanAccessTokenIssuer.java",
+        "src/main/java/dev/distracted/iam/token/HumanAccessTokenIssueCommand.java",
+        "src/test/java/dev/distracted/iam/dpop/DeadlineTokenAccessIssuerTest.java",
+        "src/test/java/dev/distracted/iam/dpop/DefaultTokenEndpointOrchestratorTest.java",
+        "src/test/java/dev/distracted/iam/token/HumanAccessTokenIssuerTest.java",
+        "src/test/java/dev/distracted/iam/token/TokenValueObjectTest.java",
+        "src/integrationTest/java/dev/distracted/iam/dpop/DpopPersistenceIntegrationTest.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T06:11:29Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-05",
+          "decision": "reject",
+          "reviewed_at": "2026-10-30T06:02:10Z",
+          "evidence": "evidence/W07-E2-review1.md",
+          "evidence_sha256": "6125a2594f6abc731616811c6e6598ec9144845aa8d53da6b077c6a90b0cac87",
+          "severity": "medium",
+          "finding": "bean cleanup and evidence wording"
+        },
+        {
+          "reviewer": "REVIEWER-05",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T06:11:29Z",
+          "evidence": "evidence/W07-E2-review2.md",
+          "evidence_sha256": "ff4cdbdee506cbd571f5a34de2936c3355aa95935224c5be045a3d11a33131da"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-E2",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-I",
+      "title": "Integrate and prove the complete W-7 vertical slice",
+      "kind": "integration",
+      "status": "integrated",
+      "packet": "packets/W07-I.md",
+      "evidence": "evidence/W07-I.md",
+      "depends_on": [
+        "W07-E"
+      ],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/integrationTest/java/dev/distracted/iam/dpop/DpopPersistenceIntegrationTest.java",
+        "src/integrationTest/java/dev/distracted/iam/dpop/DpopTokenEndpointIntegrationTest.java",
+        "src/test/java/dev/distracted/iam/dpop/DpopDiagnosticPrivacyTest.java",
+        "src/test/java/dev/distracted/iam/architecture/ModuleBoundaryTest.java",
+        "docs/identity-platform/wayfinder/artifacts/work-item-07-red-green.md",
+        "docs/identity-platform/wayfinder/artifacts/work-item-07-decisions.md",
+        "contracts/catalog.yaml",
+        "contracts/conformance/semantic-requirements.yaml",
+        "src/test/java/dev/distracted/iam/dpop/DpopProofVerifierHardeningTest.java"
+      ],
+      "shared_paths": [
+        "build/**"
+      ],
+      "lock_groups": [
+        "contracts-catalog",
+        "dpop-integration",
+        "gradle-build"
+      ],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T07:04:57Z",
+        "summary": "Integration gates passed",
+        "next_action": "Promote independent review packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W07-E-review3.md"
+        },
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W07-I.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "integration_revision": 90,
+      "evidence_sha256": "fbf767db51bfba491272b037328dfc3c8f3c4167406d6134bddd654f9b366170",
+      "central": {
+        "task": "iam/W07-I",
+        "revision": 0,
+        "status": "integrated",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-RC",
+      "title": "Independent correctness and database review",
+      "kind": "review",
+      "status": "accepted",
+      "packet": "packets/W07-RC.md",
+      "evidence": "evidence/W07-RC.md",
+      "depends_on": [
+        "W07-I"
+      ],
+      "dependency_gate": "integrated",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/agent-work/w07/evidence/W07-RC.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T07:05:06Z",
+        "summary": "Independent review accepted",
+        "next_action": "Await other reviews or accept parent",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "REVIEWER-07",
+          "evidence": "evidence/W07-RC.md"
+        }
+      ],
+      "implementation_agent": "REVIEWER-07",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-07",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T07:05:06Z",
+          "evidence": "evidence/W07-RC.md",
+          "evidence_sha256": "a55cbb3286533abf3f4d25f8554751cc3acd3f005a8b59ab11bd7c46088ec1d0"
+        }
+      ],
+      "accepted_bindings": [
+        {
+          "packet_id": "W07-I",
+          "integration_revision": 90,
+          "evidence_sha256": "fbf767db51bfba491272b037328dfc3c8f3c4167406d6134bddd654f9b366170"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-RC",
+        "revision": 0,
+        "status": "accepted",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-RS",
+      "title": "Independent security and privacy review",
+      "kind": "review",
+      "status": "accepted",
+      "packet": "packets/W07-RS.md",
+      "evidence": "evidence/W07-RS.md",
+      "depends_on": [
+        "W07-I"
+      ],
+      "dependency_gate": "integrated",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/agent-work/w07/evidence/W07-RS.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T07:05:07Z",
+        "summary": "Independent review accepted",
+        "next_action": "Await other reviews or accept parent",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "REVIEWER-07",
+          "evidence": "evidence/W07-RS.md"
+        }
+      ],
+      "implementation_agent": "REVIEWER-07",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-07",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T07:05:07Z",
+          "evidence": "evidence/W07-RS.md",
+          "evidence_sha256": "f3c0457d1d7de979944a378a717cbf4d177611ec533f9e4f7539edd2f35d9f3f"
+        }
+      ],
+      "accepted_bindings": [
+        {
+          "packet_id": "W07-I",
+          "integration_revision": 90,
+          "evidence_sha256": "fbf767db51bfba491272b037328dfc3c8f3c4167406d6134bddd654f9b366170"
+        }
+      ],
+      "central": {
+        "task": "iam/W07-RS",
+        "revision": 0,
+        "status": "accepted",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W07-F",
+      "title": "Finalize accepted W-7 status",
+      "kind": "integration",
+      "status": "integrated",
+      "packet": "packets/W07-F.md",
+      "evidence": "evidence/W07-F.md",
+      "depends_on": [
+        "W07-RC",
+        "W07-RS"
+      ],
+      "dependency_gate": "accepted",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/work-items.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T07:05:36Z",
+        "summary": "Integration gates passed",
+        "next_action": "Promote independent review packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W07-RC.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "integration_revision": 101,
+      "evidence_sha256": "9022b541f45977a8539f5e1321b93c2be5acbfd82080bb8f0ce1a02fa92d8c26",
+      "central": {
+        "task": "iam/W07-F",
+        "revision": 0,
+        "status": "integrated",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    }
+  ],
+  "accepted_by": "OPENCODE-DS41F",
+  "central_registry": {
+    "home": "capabilities/work",
+    "board": "iam.w07",
+    "synced_at": "2026-11-01T00:00:00Z"
+  }
+}

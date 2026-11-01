@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/oauth/dpop-proof-claims.schema.json","assertedReason":"jti","instance":{"jti":"123456789012345678901","htm":"POST","htu":"https://iam.distracted.invalid/oauth2/token","iat":1792972800}}

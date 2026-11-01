@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/oauth/jwks.schema.json","instance":{"keys":[{"kty":"EC","use":"sig","alg":"ES256","kid":"dutch-key-01","crv":"P-256","x":"0123456789abcdefghijklmnopqrstuvwxyzABCDEFG","y":"ABCDEFGabcdefghijklmnopqrstuvwxyz0123456789"}]}}

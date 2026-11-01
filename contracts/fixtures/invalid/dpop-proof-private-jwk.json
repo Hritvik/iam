@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/oauth/dpop-proof-header.schema.json","assertedReason":"d","instance":{"typ":"dpop+jwt","alg":"ES256","jwk":{"kty":"EC","crv":"P-256","x":"0123456789abcdefghijklmnopqrstuvwxyzABCDEFG","y":"ABCDEFGabcdefghijklmnopqrstuvwxyz0123456789","d":"private-key-material"}}}

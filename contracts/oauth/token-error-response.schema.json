@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.distracted.dev/iam/oauth/token-error-response.schema.json",
+  "title": "Closed OAuth Token Error Response v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["error", "error_description", "correlation_id"],
+  "properties": {
+    "error": {"enum": ["invalid_request", "invalid_client", "invalid_grant", "invalid_dpop_proof", "use_dpop_nonce", "temporarily_unavailable"]},
+    "error_description": {"enum": ["Request is invalid", "Client presentation is invalid", "Authorization grant is invalid", "DPoP proof is invalid", "A fresh DPoP nonce is required", "Service is temporarily unavailable"]},
+    "correlation_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"}
+  },
+  "allOf": [{"oneOf": [
+    {"properties": {"error": {"const": "invalid_request"}, "error_description": {"const": "Request is invalid"}}},
+    {"properties": {"error": {"const": "invalid_client"}, "error_description": {"const": "Client presentation is invalid"}}},
+    {"properties": {"error": {"const": "invalid_grant"}, "error_description": {"const": "Authorization grant is invalid"}}},
+    {"properties": {"error": {"const": "invalid_dpop_proof"}, "error_description": {"const": "DPoP proof is invalid"}}},
+    {"properties": {"error": {"const": "use_dpop_nonce"}, "error_description": {"const": "A fresh DPoP nonce is required"}}},
+    {"properties": {"error": {"const": "temporarily_unavailable"}, "error_description": {"const": "Service is temporarily unavailable"}}}
+  ]}]
+}

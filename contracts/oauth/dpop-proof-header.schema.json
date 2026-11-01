@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.distracted.dev/iam/oauth/dpop-proof-header.schema.json",
+  "title": "DPoP Proof JOSE Header v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["typ", "alg", "jwk"],
+  "properties": {
+    "typ": {"const": "dpop+jwt"},
+    "alg": {"const": "ES256"},
+    "jwk": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kty", "crv", "x", "y"],
+      "properties": {
+        "kty": {"const": "EC"},
+        "crv": {"const": "P-256"},
+        "x": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"},
+        "y": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"}
+      }
+    }
+  }
+}

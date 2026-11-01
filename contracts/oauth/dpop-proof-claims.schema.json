@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.distracted.dev/iam/oauth/dpop-proof-claims.schema.json",
+  "title": "Token Endpoint DPoP Proof Claims v1",
+  "type": "object", "additionalProperties": false,
+  "required": ["jti", "htm", "htu", "iat"],
+  "properties": {
+    "jti": {"type": "string", "pattern": "^[A-Za-z0-9_-]{22,128}$"},
+    "htm": {"enum": ["POST", "GET", "HEAD", "PUT", "PATCH", "DELETE"]},
+    "htu": {"type": "string", "format": "uri", "pattern": "^https://", "maxLength": 512},
+    "iat": {"type": "integer", "minimum": 1},
+    "nonce": {"type": "string", "pattern": "^[A-Za-z0-9_-]{43}$"}
+  }
+}

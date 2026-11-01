@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/manifest/product-security-policy.schema.json","instance":{"policyVersion":1,"requireDpop":true,"requiredPkceMethod":"S256","allowedGrantTypes":["authorization_code"],"requiredActivationEvidence":["verified_identifier","usable_factor","recovery_path"]}}

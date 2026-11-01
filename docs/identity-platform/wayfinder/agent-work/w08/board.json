@@ -1,0 +1,373 @@
+{
+  "schema_version": 1,
+  "revision": 25,
+  "project": "IAM W-8 strict Dutch activation and onboarding intent",
+  "source_plan": "../../work-items.md#W-8",
+  "review_threshold": "medium",
+  "parent_status": "accepted",
+  "parent_acceptance_packet": "W08-F",
+  "repository_root_up": 5,
+  "lock_stale_after_seconds": 1800,
+  "claim_stale_after_seconds": 1800,
+  "execution_leases": {},
+  "packets": [
+    {
+      "id": "W08-A",
+      "title": "Evaluate prerequisites and persist strict activation",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W08-A.md",
+      "evidence": "evidence/W08-A.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/resources/db/migration/V10__app_activation.sql",
+        "src/main/java/dev/distracted/iam/activation/AppActivation.java",
+        "src/main/java/dev/distracted/iam/activation/ActivationState.java",
+        "src/main/java/dev/distracted/iam/activation/ActivationPrerequisites.java",
+        "src/main/java/dev/distracted/iam/activation/ActivationPrerequisiteEvaluator.java",
+        "src/main/java/dev/distracted/iam/activation/AppActivationService.java",
+        "src/main/java/dev/distracted/iam/activation/AppActivationRepository.java",
+        "src/main/java/dev/distracted/iam/activation/adapter/jdbc/JdbcAppActivationRepository.java",
+        "src/test/java/dev/distracted/iam/activation/ActivationPrerequisiteEvaluatorTest.java",
+        "src/test/java/dev/distracted/iam/activation/AppActivationServiceTest.java",
+        "src/integrationTest/java/dev/distracted/iam/activation/AppActivationPersistenceIntegrationTest.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T13:52:06Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-09",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T13:52:06Z",
+          "evidence": "evidence/W08-A-review.md",
+          "evidence_sha256": "4f99dd9365d174e26ae0d36d524a72bf6b6780901397d60243a9f618b4f002da"
+        }
+      ],
+      "central": {
+        "task": "iam/W08-A",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W08-B",
+      "title": "Append the canonical onboarding intent exactly once",
+      "kind": "implementation",
+      "status": "reviewed",
+      "packet": "packets/W08-B.md",
+      "evidence": "evidence/W08-B.md",
+      "depends_on": [],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/resources/db/migration/V11__onboarding_intent.sql",
+        "src/main/java/dev/distracted/iam/messaging/OnboardingIntent.java",
+        "src/main/java/dev/distracted/iam/messaging/OnboardingEventFactory.java",
+        "src/main/java/dev/distracted/iam/messaging/OnboardingIntentWriter.java",
+        "src/main/java/dev/distracted/iam/messaging/adapter/jdbc/JdbcOnboardingIntentWriter.java",
+        "src/test/java/dev/distracted/iam/messaging/OnboardingEventFactoryTest.java",
+        "src/integrationTest/java/dev/distracted/iam/messaging/OnboardingIntentPersistenceIntegrationTest.java"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T13:52:06Z",
+        "summary": "Independent review accepted",
+        "next_action": "Promote dependent packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "implementation_agent": "OPENCODE-DS41F",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-09",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T13:52:06Z",
+          "evidence": "evidence/W08-B-review.md",
+          "evidence_sha256": "58b2fd3996a4184f5f73f77f6547dcdf69189ad31c58178b4086551edb4f6f09"
+        }
+      ],
+      "central": {
+        "task": "iam/W08-B",
+        "revision": 0,
+        "status": "reviewed",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W08-C",
+      "title": "Compose and prove the first-activation transaction",
+      "kind": "integration",
+      "status": "integrated",
+      "packet": "packets/W08-C.md",
+      "evidence": "evidence/W08-C.md",
+      "depends_on": [
+        "W08-A",
+        "W08-B"
+      ],
+      "dependency_gate": "reviewed",
+      "write_paths": [
+        "src/main/java/dev/distracted/iam/activation/FirstActivationTransaction.java",
+        "src/main/java/dev/distracted/iam/activation/ActivationApplicationConfiguration.java",
+        "src/integrationTest/java/dev/distracted/iam/activation/FirstActivationIntegrationTest.java",
+        "docs/identity-platform/wayfinder/artifacts/work-item-08-red-green.md",
+        "src/integrationTest/java/dev/distracted/iam/registration/RegistrationPersistenceIntegrationTest.java",
+        "src/integrationTest/java/dev/distracted/iam/registration/RegistrationMetadataHttpIntegrationTest.java",
+        "src/integrationTest/java/dev/distracted/iam/activation/AppSubjectPersistenceIntegrationTest.java",
+        "src/integrationTest/java/dev/distracted/iam/authorization/AuthorizationCodePersistenceIntegrationTest.java",
+        "src/integrationTest/java/dev/distracted/iam/identity/IdentityEvidencePersistenceIntegrationTest.java",
+        "src/integrationTest/java/dev/distracted/iam/registration/WorkUnit03MigrationIntegrationTest.java",
+        "src/main/java/dev/distracted/iam/messaging/MessagingApplicationConfiguration.java"
+      ],
+      "shared_paths": [
+        "build/**"
+      ],
+      "lock_groups": [
+        "gradle-build"
+      ],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T14:01:30Z",
+        "summary": "Integration gates passed",
+        "next_action": "Promote independent review packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W08-A-review.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "integration_revision": 13,
+      "evidence_sha256": "bb1276eddef105a9a1a79f8420f0acff17d9dc3b9e5d2210abdf31d3d050b862",
+      "central": {
+        "task": "iam/W08-C",
+        "revision": 0,
+        "status": "integrated",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W08-RC",
+      "title": "Independent correctness and database review",
+      "kind": "review",
+      "status": "accepted",
+      "packet": "packets/W08-RC.md",
+      "evidence": "evidence/W08-RC.md",
+      "depends_on": [
+        "W08-C"
+      ],
+      "dependency_gate": "integrated",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/agent-work/w08/evidence/W08-RC.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T14:21:38Z",
+        "summary": "Independent review accepted",
+        "next_action": "Await other reviews or accept parent",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "REVIEWER-10",
+          "evidence": "evidence/W08-RC.md"
+        }
+      ],
+      "implementation_agent": "REVIEWER-10",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-10",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T14:21:38Z",
+          "evidence": "evidence/W08-RC.md",
+          "evidence_sha256": "8c1e6a9f9a48bc0f8449213a614c2f3d338ddfcc0510e378d19ae1cb30acf270"
+        }
+      ],
+      "accepted_bindings": [
+        {
+          "packet_id": "W08-C",
+          "integration_revision": 13,
+          "evidence_sha256": "bb1276eddef105a9a1a79f8420f0acff17d9dc3b9e5d2210abdf31d3d050b862"
+        }
+      ],
+      "central": {
+        "task": "iam/W08-RC",
+        "revision": 0,
+        "status": "accepted",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W08-RS",
+      "title": "Independent security and privacy review",
+      "kind": "review",
+      "status": "accepted",
+      "packet": "packets/W08-RS.md",
+      "evidence": "evidence/W08-RS.md",
+      "depends_on": [
+        "W08-C"
+      ],
+      "dependency_gate": "integrated",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/agent-work/w08/evidence/W08-RS.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T14:21:38Z",
+        "summary": "Independent review accepted",
+        "next_action": "Await other reviews or accept parent",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "REVIEWER-10",
+          "evidence": "evidence/W08-RS.md"
+        }
+      ],
+      "implementation_agent": "REVIEWER-10",
+      "reviews": [
+        {
+          "reviewer": "REVIEWER-10",
+          "decision": "approve",
+          "reviewed_at": "2026-10-30T14:21:38Z",
+          "evidence": "evidence/W08-RS.md",
+          "evidence_sha256": "27be0e70f093fae89dd50dd77698927d1597952c1c6f52b42e89f8df37c91284"
+        }
+      ],
+      "accepted_bindings": [
+        {
+          "packet_id": "W08-C",
+          "integration_revision": 13,
+          "evidence_sha256": "bb1276eddef105a9a1a79f8420f0acff17d9dc3b9e5d2210abdf31d3d050b862"
+        }
+      ],
+      "central": {
+        "task": "iam/W08-RS",
+        "revision": 0,
+        "status": "accepted",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    },
+    {
+      "id": "W08-F",
+      "title": "Finalize accepted W-8 status",
+      "kind": "integration",
+      "status": "integrated",
+      "packet": "packets/W08-F.md",
+      "evidence": "evidence/W08-F.md",
+      "depends_on": [
+        "W08-RC",
+        "W08-RS"
+      ],
+      "dependency_gate": "accepted",
+      "write_paths": [
+        "docs/identity-platform/wayfinder/work-items.md"
+      ],
+      "shared_paths": [],
+      "lock_groups": [],
+      "execution_lock_groups": [
+        "iam-build"
+      ],
+      "claim": null,
+      "checkpoint": {
+        "updated_at": "2026-10-30T14:22:03Z",
+        "summary": "Integration gates passed",
+        "next_action": "Promote independent review packets",
+        "last_verified_command": null,
+        "current_failure": null,
+        "changed_files": [],
+        "decisions": [],
+        "risks": [],
+        "blockers": [],
+        "unblock_condition": null
+      },
+      "unblock_history": [
+        {
+          "actor": "OPENCODE-DS41F",
+          "evidence": "evidence/W08-RC.md"
+        }
+      ],
+      "implementation_agent": "OPENCODE-DS41F",
+      "integration_revision": 24,
+      "evidence_sha256": "760db6f6b80632629b6c8cf4f9a7c53a25715f8a8357949923007483e9e1e753",
+      "central": {
+        "task": "iam/W08-F",
+        "revision": 0,
+        "status": "integrated",
+        "claim": null,
+        "synced_at": "2026-11-01T00:00:00Z"
+      }
+    }
+  ],
+  "accepted_by": "OPENCODE-DS41F",
+  "central_registry": {
+    "home": "capabilities/work",
+    "board": "iam.w08",
+    "synced_at": "2026-11-01T00:00:00Z"
+  }
+}

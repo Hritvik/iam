@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/http/error-envelope.schema.json","assertedReason":"debug","instance":{"error":{"code":"invalid_request","message":"Request is invalid","correlationId":"correlation-001","details":[{"field":"limit","code":"invalid","message":"Invalid","debug":"internal"}]}}}

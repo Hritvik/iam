@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/http/error-envelope.schema.json","assertedReason":"one and only one","instance":{"error":{"code":"not_found","message":"Access is denied","correlationId":"correlation-001"}}}

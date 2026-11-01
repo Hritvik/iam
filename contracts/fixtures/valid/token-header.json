@@ -1,0 +1,1 @@
+{"schema":"https://contracts.distracted.dev/iam/oauth/human-access-token-header.schema.json","instance":{"typ":"at+jwt","alg":"ES256","kid":"dutch-key-01"}}

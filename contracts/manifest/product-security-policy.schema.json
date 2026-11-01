@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.distracted.dev/iam/manifest/product-security-policy.schema.json",
+  "title": "Product Security Policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["policyVersion", "requireDpop", "requiredPkceMethod", "allowedGrantTypes", "requiredActivationEvidence"],
+  "properties": {
+    "policyVersion": {"const": 1},
+    "requireDpop": {"const": true},
+    "requiredPkceMethod": {"const": "S256"},
+    "allowedGrantTypes": {"type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true, "prefixItems": [{"const": "authorization_code"}], "items": false},
+    "requiredActivationEvidence": {
+      "type": "array", "minItems": 3, "maxItems": 3, "uniqueItems": true,
+      "allOf": [{"contains": {"const": "verified_identifier"}}, {"contains": {"const": "usable_factor"}}, {"contains": {"const": "recovery_path"}}],
+      "items": {"enum": ["verified_identifier", "usable_factor", "recovery_path"]}
+    }
+  }
+}
