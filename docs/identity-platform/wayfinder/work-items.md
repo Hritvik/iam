@@ -464,6 +464,8 @@ These work items descend from the [Identity Platform Foundation through Dutch On
 
 ## Named gaps
 
+- **Deployment and production operations.** Tracked separately in [deployment work items](deployment-work-items.md) as `DEP-1`…`DEP-6`.
+
 - **Dependency vulnerability scanning.** Locking, dependency verification, policy checks, and an SBOM exist, but no approved vulnerability scanner is configured. W-14 records this as HITL if repository policy still provides no approved choice.
 - **Dutch-owned contract inventory.** W-10 must inspect current Dutch contracts and reconcile existing shapes inside the pinned privacy boundary.
 - **Retained Dutch UMS migration snapshot.** If none exists, W-11 records that fact and tests the oldest reproducible checked-in baseline rather than inventing history.
