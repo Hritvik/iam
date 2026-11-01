@@ -1,7 +1,49 @@
+# ---------------------------------------------------------------------------
+# OS + editors
+# ---------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# ---------------------------------------------------------------------------
+# Secrets + local overrides (never commit)
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+
+# ---------------------------------------------------------------------------
+# JVM / Gradle
+# ---------------------------------------------------------------------------
 .gradle/
+.gradle-user-home/
 build/
 out/
-*.iml
-.idea/
-.DS_Store
-
+bin/
+*.class
+hs_err_pid*
+replay_pid*
+# keep wrapper + lockfiles
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
