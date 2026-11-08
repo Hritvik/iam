@@ -1,0 +1,18 @@
+{
+  "schema": "https://contracts.distracted.dev/iam/oauth/workload-access-token-claims.schema.json",
+  "instance": {
+    "iss": "https://iam.distracted.invalid",
+    "sub": "wl_0123456789abcdefghijklmnop",
+    "aud": "https://iam.distracted.invalid/internal/onboarding",
+    "iat": 1767225600,
+    "exp": 1767225900,
+    "jti": "0123456789abcdefghijklmnop",
+    "client_id": "ums-ingestion",
+    "token_profile": "workload_access",
+    "token_version": 1,
+    "subject_kind": "workload",
+    "scope": "iam:onboarding:read",
+    "app_id": "dutch-development",
+    "security_version": 1
+  }
+}

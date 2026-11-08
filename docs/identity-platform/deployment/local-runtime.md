@@ -115,3 +115,38 @@ docker compose down --volumes  # discard database data and role state
 | `registration_reconciler_configuration_missing` | Reconciler URL, user or password is empty. |
 | `registration_authority_invalid` | Runtime and reconciler roles share a credential or membership. |
 | Readiness probe fails while liveness passes | Database connectivity or a failed migration. |
+
+## Workload identity and the relay
+
+The development runtime also wires the workload profile from secret-backed keys:
+
+- `IAM_WORKLOAD_ENABLED=true` creates the workload issuer and verifier.
+- `IAM_MESSAGING_ENABLED=true` exposes the internal onboarding snapshot route.
+- `IAM_RELAY_ENABLED=false` keeps outbound delivery off until a consumer endpoint exists.
+
+Verify the snapshot fails closed without a token:
+
+```bash
+docker compose exec iam curl -s -o /dev/null -w '%{http_code}\n' \
+  http://localhost:8080/internal/v1/apps/dutch-development/onboarding
+```
+
+It must print `404`, both anonymously and with a malformed bearer token. The route never reveals
+whether the app, audience, scope, or workload was wrong.
+
+To exercise outbound delivery, provide a consumer endpoint and enable the relay:
+
+```bash
+# in .env
+IAM_RELAY_ENABLED=true
+IAM_RELAY_ENDPOINT=https://ums.localhost/internal/v1/iam/events
+IAM_RELAY_SCHEDULE_ENABLED=true
+IAM_WORKLOAD_AUDIENCE=https://ums.localhost/internal/v1/iam/events
+IAM_WORKLOAD_SCOPE=ums:onboarding:write
+```
+
+The relay mints a short-lived workload token, posts the published event envelope, acknowledges on
+2xx, retries 408/429/5xx, and quarantines other 4xx. Counters appear as
+`iam.relay.deliveries{outcome=claimed|published|acknowledged|quarantined}`.
+
+The full profile is in [workload-token-profile.md](workload-token-profile.md).

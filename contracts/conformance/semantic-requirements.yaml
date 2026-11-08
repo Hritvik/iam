@@ -21,6 +21,19 @@ token:
       - auth_time is absent or less than or equal to iat
     extensibility: Apply the same tuple rules to each first-party app's own registration; Dutch values are conformance fixtures, not platform constants.
     verification: Issuer and resource implementation tests must reject each mismatch.
+  workloadAccess:
+    level: MUST
+    requirements:
+      - iss equals the workload token issuer
+      - aud equals exactly one registered workload audience
+      - app_id and client_id equal the registered workload binding
+      - sub is a stable workload identity, never a human identity or app subject
+      - token_profile is workload_access, token_version is 1, and subject_kind is workload
+      - scope is a subset of the binding's allowed scopes and contains the resource's required scope
+      - exp is greater than iat and the token lifetime does not exceed 900 seconds
+      - workload tokens carry no cnf, acr, amr, auth_time, or act claim
+      - a resource rejects a workload token for a different app registration with a non-enumerating 404
+    verification: Issuer and resource implementation tests must reject each mismatch before state mutation.
   dpopTokenEndpoint:
     level: MUST
     requirements:

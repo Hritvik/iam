@@ -55,6 +55,8 @@ final class CanonicalContractsTest {
             "oauth/jwks.schema.json",
             "oauth/protected-resource-metadata.schema.json",
             "oauth/human-access-token-claims.schema.json",
+            "oauth/workload-access-token-header.schema.json",
+            "oauth/workload-access-token-claims.schema.json",
             "oauth/dpop-proof-header.schema.json",
             "oauth/dpop-proof-claims.schema.json",
             "oauth/token-response.schema.json",
@@ -70,7 +72,7 @@ final class CanonicalContractsTest {
     @Test
     void catalogIsCompleteUniqueAndEveryEntryFullyParses() throws IOException {
         JsonNode catalog = catalog();
-        assertEquals("1.0.0", catalog.required("version").textValue());
+        assertEquals("1.1.0", catalog.required("version").textValue());
         Set<String> names = new HashSet<>();
         Set<String> paths = new HashSet<>();
         for (JsonNode contract : catalog.required("contracts")) {
@@ -110,8 +112,8 @@ final class CanonicalContractsTest {
     void fixtureInventoryIsNonVacuousAndExternallyMapsSchemas() throws IOException {
         List<Path> valid = jsonFiles(CONTRACTS.resolve("fixtures/valid"));
         List<Path> invalid = jsonFiles(CONTRACTS.resolve("fixtures/invalid"));
-        assertEquals(15, valid.size());
-        assertEquals(58, invalid.size());
+        assertEquals(16, valid.size());
+        assertEquals(62, invalid.size());
         for (Path fixture : valid) {
             JsonNode wrapper = JSON.readTree(fixture.toFile());
             List<String> failures = validateFixture(wrapper);
@@ -164,6 +166,11 @@ final class CanonicalContractsTest {
         assertEquals("mutualTLS", scheme.getType().toString());
         var operation = openApi.getPaths().get("/internal/v1/apps/{appRegistrationId}/onboarding").getGet();
         assertEquals(List.of(), operation.getSecurity().getFirst().get("registeredWorkloadMtls"));
+        assertEquals(List.of(), operation.getSecurity().get(1).get("registeredWorkloadToken"));
+        var tokenScheme = openApi.getComponents().getSecuritySchemes().get("registeredWorkloadToken");
+        assertNotNull(tokenScheme);
+        assertEquals("http", tokenScheme.getType().toString());
+        assertEquals("bearer", tokenScheme.getScheme());
         assertEquals("iam:onboarding:read", operation.getExtensions().get("x-required-scope"));
         assertEquals("https://iam.distracted.invalid/internal/onboarding",
                 operation.getExtensions().get("x-required-audience"));

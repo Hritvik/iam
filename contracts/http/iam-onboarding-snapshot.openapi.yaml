@@ -13,6 +13,7 @@ paths:
       x-workload-app-binding: 'path appRegistrationId MUST equal the authenticated workload app registration; mismatch returns 404'
       security:
         - registeredWorkloadMtls: []
+        - registeredWorkloadToken: []
       parameters:
         - name: appRegistrationId
           in: path
@@ -53,6 +54,11 @@ components:
     registeredWorkloadMtls:
       type: mutualTLS
       description: Registered first-party workload certificate bound to one app registration. Authorization also requires scope iam:onboarding:read and audience https://iam.distracted.invalid/internal/onboarding.
+    registeredWorkloadToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Accepted 2026-11-08. Workload access token (workload_access v1) bound to one app registration. Authorization also requires scope iam:onboarding:read and audience https://iam.distracted.invalid/internal/onboarding.
   schemas:
     OnboardingSnapshotEnvelope:
       type: object

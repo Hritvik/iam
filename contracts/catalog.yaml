@@ -1,5 +1,5 @@
 name: distracted-identity-platform-contracts
-version: 1.0.0
+version: 1.1.0
 contracts:
   - name: app-registration
     kind: json-schema
@@ -34,6 +34,14 @@ contracts:
     kind: json-schema
     schemaVersion: 1.0.0
     path: oauth/human-access-token-claims.schema.json
+  - name: workload-access-token-header
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/workload-access-token-header.schema.json
+  - name: workload-access-token-claims
+    kind: json-schema
+    schemaVersion: 1.0.0
+    path: oauth/workload-access-token-claims.schema.json
   - name: dpop-proof-header
     kind: json-schema
     schemaVersion: 1.0.0

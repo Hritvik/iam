@@ -51,3 +51,44 @@ iam:
   fixtures:
     deterministic-identity:
       enabled: ${IAM_FIXTURES_ENABLED:false}
+  messaging:
+    enabled: ${IAM_MESSAGING_ENABLED:false}
+    relay:
+      enabled: ${IAM_RELAY_ENABLED:false}
+      owner: ${IAM_RELAY_OWNER:iam-relay-1}
+      jdbc-url: ${IAM_RELAY_URL:${IAM_DB_URL}}
+      username: ${IAM_RELAY_USERNAME:iam_relay}
+      password: ${IAM_RELAY_PASSWORD}
+      transport:
+        mode: ${IAM_RELAY_TRANSPORT:http}
+        endpoint: ${IAM_RELAY_ENDPOINT:}
+        workload-id: ${IAM_WORKLOAD_ID:wl_localdevelopmentrelay01}
+        audience: ${IAM_WORKLOAD_AUDIENCE:https://ums.localhost/internal/v1/iam/events}
+        scope: ${IAM_WORKLOAD_SCOPE:ums:onboarding:write}
+        connect-timeout-ms: ${IAM_RELAY_CONNECT_TIMEOUT_MS:2000}
+        request-timeout-ms: ${IAM_RELAY_REQUEST_TIMEOUT_MS:5000}
+      schedule:
+        enabled: ${IAM_RELAY_SCHEDULE_ENABLED:false}
+        interval-ms: ${IAM_RELAY_INTERVAL_MS:5000}
+  workload:
+    enabled: ${IAM_WORKLOAD_ENABLED:false}
+    issuer: ${IAM_ISSUER:https://iam.localhost}
+    lifetime-seconds: ${IAM_WORKLOAD_LIFETIME_SECONDS:300}
+    skew-seconds: ${IAM_WORKLOAD_SKEW_SECONDS:30}
+    signing:
+      key-id: ${IAM_WORKLOAD_KEY_ID:local-workload-v1}
+      private-key: ${IAM_WORKLOAD_SIGNING_PRIVATE_KEY:}
+      public-key: ${IAM_WORKLOAD_SIGNING_PUBLIC_KEY:}
+    trusted-keys:
+      - key-id: ${IAM_WORKLOAD_KEY_ID:local-workload-v1}
+        public-key: ${IAM_WORKLOAD_SIGNING_PUBLIC_KEY:}
+    bindings:
+      - workload-id: ${IAM_WORKLOAD_ID:wl_localdevelopmentrelay01}
+        app-registration-id: ${IAM_WORKLOAD_APP_ID:dutch-development}
+        client-id: ${IAM_WORKLOAD_CLIENT_ID:iam-relay}
+        audiences:
+          - ${IAM_WORKLOAD_AUDIENCE:https://ums.localhost/internal/v1/iam/events}
+          - https://iam.distracted.invalid/internal/onboarding
+        scopes:
+          - ${IAM_WORKLOAD_SCOPE:ums:onboarding:write}
+          - iam:onboarding:read
