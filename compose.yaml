@@ -37,7 +37,7 @@ services:
       IAM_RECONCILER_URL: ${IAM_RECONCILER_URL:-${IAM_DB_URL:-jdbc:postgresql://postgres:5432/iam}}
       IAM_RECONCILER_USERNAME: ${IAM_RECONCILER_USERNAME:-iam_registration_reconciler}
       IAM_RECONCILER_PASSWORD: ${IAM_RECONCILER_PASSWORD:?run deploy/generate-local-secrets.sh first}
-      IAM_ISSUER: ${IAM_ISSUER:-https://iam.localhost}
+      IAM_ISSUER: ${IAM_ISSUER:-https://iam.example.test}
       IAM_REGISTRATION_ENABLED: ${IAM_REGISTRATION_ENABLED:-false}
       IAM_CRYPTO_LOCAL_ENABLED: ${IAM_CRYPTO_LOCAL_ENABLED:-false}
       IAM_CRYPTO_LOCAL_PROVIDER: ${IAM_CRYPTO_LOCAL_PROVIDER:-local-jca}
@@ -52,6 +52,26 @@ services:
       IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_REFERENCE: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_REFERENCE:-local-challenge-digest-v1}
       IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY:?run deploy/generate-local-secrets.sh first}
       IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_VERSION: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_VERSION:-1}
+      IAM_FIXTURES_ENABLED: ${IAM_FIXTURES_ENABLED:-false}
+      IAM_MESSAGING_ENABLED: ${IAM_MESSAGING_ENABLED:-false}
+      IAM_RELAY_ENABLED: ${IAM_RELAY_ENABLED:-false}
+      IAM_RELAY_OWNER: ${IAM_RELAY_OWNER:-iam-relay-1}
+      IAM_RELAY_PASSWORD: ${IAM_RELAY_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_RELAY_SCHEDULE_ENABLED: ${IAM_RELAY_SCHEDULE_ENABLED:-false}
+      IAM_RELAY_ENDPOINT: ${IAM_RELAY_ENDPOINT:-https://ums.example.test/internal/iam/events}
+      IAM_RELAY_CONNECT_TIMEOUT_MS: ${IAM_RELAY_CONNECT_TIMEOUT_MS:-2000}
+      IAM_RELAY_REQUEST_TIMEOUT_MS: ${IAM_RELAY_REQUEST_TIMEOUT_MS:-5000}
+      IAM_RELAY_INTERVAL_MS: ${IAM_RELAY_INTERVAL_MS:-5000}
+      IAM_WORKLOAD_ENABLED: ${IAM_WORKLOAD_ENABLED:-false}
+      IAM_WORKLOAD_KEY_ID: ${IAM_WORKLOAD_KEY_ID:-local-workload-v1}
+      IAM_WORKLOAD_SIGNING_PRIVATE_KEY: ${IAM_WORKLOAD_SIGNING_PRIVATE_KEY:?run deploy/generate-local-secrets.sh first}
+      IAM_WORKLOAD_SIGNING_PUBLIC_KEY: ${IAM_WORKLOAD_SIGNING_PUBLIC_KEY:?run deploy/generate-local-secrets.sh first}
+      IAM_WORKLOAD_ID: ${IAM_WORKLOAD_ID:-wl_localdevelopmentrelay01}
+      IAM_WORKLOAD_APP_ID: ${IAM_WORKLOAD_APP_ID:-dutch-development}
+      IAM_WORKLOAD_CLIENT_ID: ${IAM_WORKLOAD_CLIENT_ID:-iam-relay}
+      IAM_WORKLOAD_AUDIENCE: ${IAM_WORKLOAD_AUDIENCE:-https://ums.example.test/internal/iam/events}
+      IAM_WORKLOAD_SCOPE: ${IAM_WORKLOAD_SCOPE:-ums:onboarding:write}
+      IAM_WORKLOAD_SECURITY_VERSION: ${IAM_WORKLOAD_SECURITY_VERSION:-1}
     depends_on:
       postgres:
         condition: service_healthy

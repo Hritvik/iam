@@ -22,7 +22,9 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 class WorkloadJwksTest {
@@ -41,7 +43,9 @@ class WorkloadJwksTest {
         assertThat(publisher.document().keys()).extracting(value -> value.get("kid"))
                 .containsExactly("workload-key-1");
 
-        var mvc = MockMvcBuilders.standaloneSetup(new JwksController(publisher)).build();
+        var beans = new StaticListableBeanFactory(Map.of("jwks", publisher));
+        var mvc = MockMvcBuilders.standaloneSetup(
+                new JwksController(beans.getBeanProvider(JwksPublisher.class))).build();
         mvc.perform(get("/oauth2/jwks"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.keys[0].kid").value("workload-key-1"))

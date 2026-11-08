@@ -29,6 +29,8 @@ Wiring:
   failure rather than an uncaught exception.
 - `iam.messaging.relay.schedule.enabled=true` starts the scheduler.
 - The relay connects as `iam_relay`, never as the runtime or migration role.
+- `compose.yaml` passes the relay and workload variables explicitly; the development runtime starts
+  with `IAM_WORKLOAD_ENABLED=true` and `IAM_MESSAGING_ENABLED=true`.
 - A missing issuer, endpoint, workload id, audience, scope or timeout fails startup; there is no
   test-only transport in the runtime path.
 

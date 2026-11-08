@@ -32,6 +32,22 @@ public record WorkloadIdentityProperties(
             List<String> audiences,
             List<String> scopes,
             Integer securityVersion) {
+        @org.springframework.boot.context.properties.bind.ConstructorBinding
+        public Binding(
+                String workloadId,
+                String appRegistrationId,
+                String clientId,
+                List<String> audiences,
+                List<String> scopes,
+                Integer securityVersion) {
+            this.workloadId = workloadId;
+            this.appRegistrationId = appRegistrationId;
+            this.clientId = clientId;
+            this.audiences = audiences;
+            this.scopes = scopes;
+            this.securityVersion = securityVersion;
+        }
+
         public Binding(
                 String workloadId,
                 String appRegistrationId,

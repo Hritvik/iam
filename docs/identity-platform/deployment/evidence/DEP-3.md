@@ -67,6 +67,9 @@ Focused coverage:
   published key verifies an issued token and that a stale key does not.
 - `security_version` is bound to the workload binding: a token minted for version 2 is rejected by a
   verifier expecting version 1.
+- The development runtime serves the workload key at `/oauth2/jwks` with
+  `kid=local-workload-v1`; the internal snapshot still answers the non-enumerating 404 and readiness
+  stays `UP`.
 - Issuer rejection of invalid issuer forms, lifetimes, key material, key ids and binding shapes.
 - Contract validation of the new schemas and valid/invalid fixtures.
 

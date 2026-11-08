@@ -15,7 +15,9 @@ import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import dev.distracted.iam.token.AccessTokenSigningCapability;
 import dev.distracted.iam.token.JwksPublisher;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -24,7 +26,9 @@ class JwksControllerTest {
         var key = new ECKeyGenerator(Curve.P_256).keyID("signing01")
                 .keyUse(com.nimbusds.jose.jwk.KeyUse.SIGNATURE).algorithm(JWSAlgorithm.ES256).generate();
         var publisher = new JwksPublisher(new Signer(key));
-        var mvc = MockMvcBuilders.standaloneSetup(new JwksController(publisher)).build();
+        var beans = new StaticListableBeanFactory(Map.of("jwks", publisher));
+        var mvc = MockMvcBuilders.standaloneSetup(
+                new JwksController(beans.getBeanProvider(JwksPublisher.class))).build();
 
         mvc.perform(get("/oauth2/jwks"))
                 .andExpect(status().isOk()).andExpect(content().contentType("application/json"))
