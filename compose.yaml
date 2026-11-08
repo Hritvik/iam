@@ -1,0 +1,68 @@
+name: iam-local
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-iam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_MIGRATOR_PASSWORD: ${IAM_MIGRATOR_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_RUNTIME_PASSWORD: ${IAM_RUNTIME_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_RELAY_PASSWORD: ${IAM_RELAY_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_REGISTRATION_RECONCILER_PASSWORD: ${IAM_REGISTRATION_RECONCILER_PASSWORD:?run deploy/generate-local-secrets.sh first}
+    volumes:
+      - iam-postgres:/var/lib/postgresql
+      - ./deploy/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+
+  iam:
+    build:
+      context: .
+    image: iam:local
+    environment:
+      SPRING_PROFILES_ACTIVE: development
+      IAM_DB_URL: ${IAM_DB_URL:-jdbc:postgresql://postgres:5432/iam}
+      IAM_DB_USERNAME: ${IAM_DB_USERNAME:-iam_runtime}
+      IAM_DB_PASSWORD: ${IAM_DB_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_DB_POOL_SIZE: ${IAM_DB_POOL_SIZE:-10}
+      IAM_DB_MIN_IDLE: ${IAM_DB_MIN_IDLE:-2}
+      IAM_FLYWAY_URL: ${IAM_FLYWAY_URL:-${IAM_DB_URL:-jdbc:postgresql://postgres:5432/iam}}
+      IAM_FLYWAY_USERNAME: ${IAM_FLYWAY_USERNAME:-iam_migrator}
+      IAM_FLYWAY_PASSWORD: ${IAM_FLYWAY_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_RECONCILER_URL: ${IAM_RECONCILER_URL:-${IAM_DB_URL:-jdbc:postgresql://postgres:5432/iam}}
+      IAM_RECONCILER_USERNAME: ${IAM_RECONCILER_USERNAME:-iam_registration_reconciler}
+      IAM_RECONCILER_PASSWORD: ${IAM_RECONCILER_PASSWORD:?run deploy/generate-local-secrets.sh first}
+      IAM_ISSUER: ${IAM_ISSUER:-https://iam.localhost}
+      IAM_REGISTRATION_ENABLED: ${IAM_REGISTRATION_ENABLED:-false}
+      IAM_CRYPTO_LOCAL_ENABLED: ${IAM_CRYPTO_LOCAL_ENABLED:-false}
+      IAM_CRYPTO_LOCAL_PROVIDER: ${IAM_CRYPTO_LOCAL_PROVIDER:-local-jca}
+      IAM_CRYPTO_LOCAL_SIGNER_KEY_ID: ${IAM_CRYPTO_LOCAL_SIGNER_KEY_ID:-local-signing-v1}
+      IAM_CRYPTO_LOCAL_SIGNER_PRIVATE_KEY: ${IAM_CRYPTO_LOCAL_SIGNER_PRIVATE_KEY:?run deploy/generate-local-secrets.sh first}
+      IAM_CRYPTO_LOCAL_ENCRYPTION_KEY_REFERENCE: ${IAM_CRYPTO_LOCAL_ENCRYPTION_KEY_REFERENCE:-local-encryption-v1}
+      IAM_CRYPTO_LOCAL_ENCRYPTION_KEY: ${IAM_CRYPTO_LOCAL_ENCRYPTION_KEY:?run deploy/generate-local-secrets.sh first}
+      IAM_CRYPTO_LOCAL_ENCRYPTION_KEY_VERSION: ${IAM_CRYPTO_LOCAL_ENCRYPTION_KEY_VERSION:-1}
+      IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY_REFERENCE: ${IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY_REFERENCE:-local-blind-index-v1}
+      IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY: ${IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY:?run deploy/generate-local-secrets.sh first}
+      IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY_VERSION: ${IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY_VERSION:-1}
+      IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_REFERENCE: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_REFERENCE:-local-challenge-digest-v1}
+      IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY:?run deploy/generate-local-secrets.sh first}
+      IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_VERSION: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_VERSION:-1}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${IAM_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 60s
+
+volumes:
+  iam-postgres:

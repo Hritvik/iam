@@ -48,7 +48,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.flywaydb:flyway-core")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
     implementation("org.flywaydb:flyway-database-postgresql")
     implementation("io.github.erdtman:java-json-canonicalization:1.1")
     implementation("com.networknt:json-schema-validator:1.5.9")
@@ -103,6 +103,9 @@ val integrationTest = tasks.register<Test>("integrationTest") {
     testClassesDirs = integrationTestSourceSet.output.classesDirs
     classpath = integrationTestSourceSet.runtimeClasspath
     shouldRunAfter(tasks.test)
+    // Integration tests migrate their own schema with an administrative connection, then boot the
+    // application as the unprivileged runtime role. Boot's Flyway auto-configuration must stay off.
+    systemProperty("spring.flyway.enabled", "false")
     doFirst {
         if (System.getenv("DOCKER_HOST").isNullOrBlank()) {
             val activeDockerHost = providers.exec {

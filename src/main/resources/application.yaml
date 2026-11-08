@@ -7,9 +7,17 @@ spring:
     virtual:
       enabled: true
 
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
 management:
   endpoints:
     web:
       exposure:
         include: health,info
-
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true

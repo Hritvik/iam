@@ -1,0 +1,53 @@
+# Local development runtime. Every credential is injected from the environment; nothing here is a
+# committed secret. See docs/identity-platform/deployment/local-runtime.md.
+spring:
+  datasource:
+    url: ${IAM_DB_URL}
+    username: ${IAM_DB_USERNAME:iam_runtime}
+    password: ${IAM_DB_PASSWORD}
+    hikari:
+      maximum-pool-size: ${IAM_DB_POOL_SIZE:10}
+      minimum-idle: ${IAM_DB_MIN_IDLE:2}
+      connection-timeout: 2000
+      validation-timeout: 1000
+  flyway:
+    enabled: true
+    url: ${IAM_FLYWAY_URL:${IAM_DB_URL}}
+    user: ${IAM_FLYWAY_USERNAME:iam_migrator}
+    password: ${IAM_FLYWAY_PASSWORD}
+
+management:
+  endpoint:
+    health:
+      group:
+        readiness:
+          include: readinessState,db
+
+iam:
+  environment: development
+  issuer: ${IAM_ISSUER:https://iam.localhost}
+  registration:
+    dutch-development:
+      enabled: ${IAM_REGISTRATION_ENABLED:false}
+    reconciler:
+      jdbc-url: ${IAM_RECONCILER_URL:${IAM_DB_URL}}
+      username: ${IAM_RECONCILER_USERNAME:iam_registration_reconciler}
+      password: ${IAM_RECONCILER_PASSWORD}
+  crypto:
+    local:
+      enabled: ${IAM_CRYPTO_LOCAL_ENABLED:false}
+      provider: ${IAM_CRYPTO_LOCAL_PROVIDER:local-jca}
+      signer-key-id: ${IAM_CRYPTO_LOCAL_SIGNER_KEY_ID:local-signing-v1}
+      signer-private-key: ${IAM_CRYPTO_LOCAL_SIGNER_PRIVATE_KEY:}
+      identifier-encryption-key-reference: ${IAM_CRYPTO_LOCAL_ENCRYPTION_KEY_REFERENCE:local-encryption-v1}
+      identifier-encryption-key: ${IAM_CRYPTO_LOCAL_ENCRYPTION_KEY:}
+      identifier-encryption-key-version: ${IAM_CRYPTO_LOCAL_ENCRYPTION_KEY_VERSION:1}
+      blind-index-key-reference: ${IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY_REFERENCE:local-blind-index-v1}
+      blind-index-key: ${IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY:}
+      blind-index-key-version: ${IAM_CRYPTO_LOCAL_BLIND_INDEX_KEY_VERSION:1}
+      challenge-digest-key-reference: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_REFERENCE:local-challenge-digest-v1}
+      challenge-digest-key: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY:}
+      challenge-digest-key-version: ${IAM_CRYPTO_LOCAL_CHALLENGE_DIGEST_KEY_VERSION:1}
+  fixtures:
+    deterministic-identity:
+      enabled: ${IAM_FIXTURES_ENABLED:false}

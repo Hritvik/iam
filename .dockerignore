@@ -1,0 +1,16 @@
+.git
+.gradle
+build
+out
+.idea
+.vscode
+.env
+.env.*
+!.env.example
+docs
+*.md
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore

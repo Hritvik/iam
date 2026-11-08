@@ -48,6 +48,28 @@ class FoundationSecurityHttpTest {
                 .andExpect(jsonPath("$.error.correlationId").value("denied-correlation"));
     }
 
+    @Test
+    void actuatorHealthIsPublicAndDoesNotLeakDetails() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.components").doesNotExist());
+    }
+
+    @Test
+    void actuatorReadinessProbeIsPublic() throws Exception {
+        mockMvc.perform(get("/actuator/health/readiness"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
+    void otherActuatorEndpointsStayBehindTheFoundationDenyAll() throws Exception {
+        mockMvc.perform(get("/actuator/info"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.error.code").value("authentication_required"));
+    }
+
     @RestController
     @PlatformEndpoint
     static class TestController {
