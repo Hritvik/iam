@@ -125,7 +125,7 @@ class WorkloadAccessTokenTest {
         assertThat(authenticator.authenticate(request("Basic abc"))).isEmpty();
         assertThat(authenticator.authenticate(request("Bearer "))).isEmpty();
         var principal = authenticator.authenticate(
-                request("Bearer " + issuer.issue(WORKLOAD_ID, AUDIENCE, "iam:onboarding:read")));
+                request("bearer " + issuer.issue(WORKLOAD_ID, AUDIENCE, "iam:onboarding:read")));
         assertThat(principal).isPresent();
         assertThat(principal.orElseThrow().appRegistrationId()).isEqualTo(APP_ID);
     }

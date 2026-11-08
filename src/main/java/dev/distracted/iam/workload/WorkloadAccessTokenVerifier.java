@@ -95,7 +95,8 @@ public final class WorkloadAccessTokenVerifier {
                 throw invalid();
             }
             var securityVersion = asInteger(rawClaims.get("security_version"));
-            if (securityVersion == null || securityVersion < 1) throw invalid();
+            if (securityVersion == null || !securityVersion.equals(binding.securityVersion() == null
+                    ? 1 : binding.securityVersion())) throw invalid();
             var jti = asString(rawClaims.get("jti"));
             if (!JTI.matcher(jti).matches()) throw invalid();
             var iat = asLong(rawClaims.get("iat"));
@@ -171,7 +172,8 @@ public final class WorkloadAccessTokenVerifier {
             WorkloadKeys.requireAppId(binding.appRegistrationId(), "workload_app_id_invalid");
             WorkloadKeys.requireClientId(binding.clientId(), "workload_client_id_invalid");
             if (binding.audiences() == null || binding.audiences().isEmpty()
-                    || binding.scopes() == null || binding.scopes().isEmpty()) {
+                    || binding.scopes() == null || binding.scopes().isEmpty()
+                    || (binding.securityVersion() != null && binding.securityVersion() < 1)) {
                 throw new WorkloadAccessTokenException("workload_binding_invalid");
             }
             result.add(binding);

@@ -7,14 +7,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @PlatformEndpoint
-@ConditionalOnProperty(name = "iam.token.enabled", havingValue = "true")
+@ConditionalOnExpression("${iam.token.enabled:false} or ${iam.workload.enabled:false}")
 public final class JwksController {
     private final JwksPublisher publisher;
 

@@ -11,7 +11,7 @@ Environment: local development runtime and unit test JVM
 | Endpoint safety | HTTPS required; plain HTTP only for loopback hosts |
 | Headers | `Authorization: Bearer`, `Content-Type: application/json`, `Accept`, `Idempotency-Key` = event id, `X-Correlation-ID` |
 | Success | Any 2xx is acknowledged |
-| Retry | 408, 429, 5xx, connection failure and timeout are retryable |
+| Retry | 401, 403, 404, 408, 429, 5xx, connection failure and timeout are retryable within the attempt budget |
 | Quarantine | Any other 4xx is non-retryable and goes to quarantine |
 | `SelfIssuedWorkloadTokenSupplier` | Mints a fresh `workload_access` token per delivery attempt; the event id stays the idempotency key |
 | `RelayScheduler` | Fixed-delay drain with lease-safe concurrent replicas |
@@ -20,7 +20,13 @@ Environment: local development runtime and unit test JVM
 Wiring:
 
 - `iam.messaging.relay.transport.mode=http` selects the transport.
-- `iam.messaging.relay.transport.endpoint` is the consumer ingestion URL.
+- `iam.messaging.relay.transport.endpoint` is the consumer ingestion URL. The development defaults
+  are the UMS-published values: issuer `https://iam.example.test`, endpoint
+  `https://ums.example.test/internal/iam/events`, audience
+  `https://ums.example.test/internal/iam/events`, scope `ums:onboarding:write`.
+- The relay binding is minted once at startup; an unregistered workload, audience or scope fails
+  startup with `relay_workload_binding_invalid`, and a later mint failure is a retryable transport
+  failure rather than an uncaught exception.
 - `iam.messaging.relay.schedule.enabled=true` starts the scheduler.
 - The relay connects as `iam_relay`, never as the runtime or migration role.
 - A missing issuer, endpoint, workload id, audience, scope or timeout fails startup; there is no
@@ -29,7 +35,7 @@ Wiring:
 ## Tests
 
 ```text
-unit tests         406 passed
+unit tests         411 passed
 integration tests  319 passed
 contract tests       8 passed
 ```
@@ -39,9 +45,12 @@ Focused coverage:
 - The posted body is the published event envelope: `eventId`, `eventType`, `schemaVersion`,
   `occurredAt`, `producer`, `environment`, `aggregate`, `correlationId`, `causationId`,
   `destination.appRegistrationId`, and the parsed payload.
-- `Authorization`, `Idempotency-Key` and `X-Correlation-ID` are exactly the expected values.
-- 200, 201, 202 and 204 are accepted; 400 and 422 are non-retryable; 408, 429, 503 and an
-  unreachable consumer are retryable.
+- `Authorization`, `Idempotency-Key` and `X-Correlation-ID` are exactly the expected values; the
+  Bearer scheme is accepted case-insensitively.
+- 200, 201, 202 and 204 are accepted; 400 and 422 are non-retryable; 401, 403, 404, 408, 429, 503
+  and an unreachable consumer are retryable.
+- An unregistered relay binding fails startup, and a mint failure during publish is a retryable
+  transport failure, so claimed events do not stay leased forever.
 - Missing, blank and malformed tokens are rejected before the request.
 - Non-loopback plain HTTP, missing hosts, userinfo, query strings, fragments, and unbounded
   connect/request timeouts are refused.
@@ -58,6 +67,11 @@ consumer and the real relay:
   `Idempotency-Key` but a new `jti`; it is acknowledged only after the 2xx.
 - A duplicate delivery of the first event reaches the consumer with the same idempotency key.
 - Acknowledgements are recorded after the successful post, never before it.
+
+Limits: the lost-response case is a 500 before the consumer commits, so ambiguous acknowledgement
+(a 2xx lost after commit) is not claimed here; durable claim/ack is covered by
+`OutboxRelayPersistenceIntegrationTest`. Trust failures now exhaust the bounded attempt budget and
+quarantine with an audit fact; an operator requeue path is not implemented.
 
 ## Deliberate gaps
 

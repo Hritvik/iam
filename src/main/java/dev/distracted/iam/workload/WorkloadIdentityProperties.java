@@ -30,6 +30,15 @@ public record WorkloadIdentityProperties(
             String appRegistrationId,
             String clientId,
             List<String> audiences,
-            List<String> scopes) {
+            List<String> scopes,
+            Integer securityVersion) {
+        public Binding(
+                String workloadId,
+                String appRegistrationId,
+                String clientId,
+                List<String> audiences,
+                List<String> scopes) {
+            this(workloadId, appRegistrationId, clientId, audiences, scopes, 1);
+        }
     }
 }

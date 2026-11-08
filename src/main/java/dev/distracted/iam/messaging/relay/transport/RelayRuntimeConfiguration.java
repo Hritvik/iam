@@ -37,6 +37,11 @@ public class RelayRuntimeConfiguration {
         var client = HttpClient.newBuilder().connectTimeout(connectTimeout).build();
         var supplier = new SelfIssuedWorkloadTokenSupplier(
                 issuer, properties.workloadId(), properties.audience(), properties.scope());
+        try {
+            supplier.token();
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException("relay_workload_binding_invalid", exception);
+        }
         return new HttpOutboxTransport(URI.create(properties.endpoint()), client, supplier, requestTimeout);
     }
 

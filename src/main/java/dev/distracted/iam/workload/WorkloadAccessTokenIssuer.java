@@ -92,7 +92,7 @@ public final class WorkloadAccessTokenIssuer {
         claims.put("subject_kind", "workload");
         claims.put("scope", canonicalScope);
         claims.put("app_id", binding.appRegistrationId());
-        claims.put("security_version", 1);
+        claims.put("security_version", securityVersion(binding));
         try {
             var object = new JWSObject(header, new Payload(claims));
             object.sign(new ECDSASigner(signingKey));
@@ -120,6 +120,10 @@ public final class WorkloadAccessTokenIssuer {
         return String.join(" ", values);
     }
 
+    private static int securityVersion(WorkloadIdentityProperties.Binding binding) {
+        return binding.securityVersion() == null ? 1 : binding.securityVersion();
+    }
+
     private static int lifetime(Integer configured) {
         var value = configured == null ? 300 : configured;
         if (value < MINIMUM_LIFETIME_SECONDS || value > MAXIMUM_LIFETIME_SECONDS) {
@@ -139,11 +143,13 @@ public final class WorkloadAccessTokenIssuer {
             WorkloadKeys.requireAppId(binding.appRegistrationId(), "workload_app_id_invalid");
             WorkloadKeys.requireClientId(binding.clientId(), "workload_client_id_invalid");
             if (binding.audiences() == null || binding.audiences().isEmpty()
-                    || binding.scopes() == null || binding.scopes().isEmpty()) {
+                    || binding.scopes() == null || binding.scopes().isEmpty()
+                    || securityVersion(binding) < 1) {
                 throw new WorkloadAccessTokenException("workload_binding_invalid");
             }
             result.add(new WorkloadIdentityProperties.Binding(binding.workloadId(), binding.appRegistrationId(),
-                    binding.clientId(), List.copyOf(binding.audiences()), List.copyOf(binding.scopes())));
+                    binding.clientId(), List.copyOf(binding.audiences()), List.copyOf(binding.scopes()),
+                    securityVersion(binding)));
         }
         return List.copyOf(result);
     }

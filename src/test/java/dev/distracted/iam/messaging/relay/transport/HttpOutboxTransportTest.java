@@ -76,10 +76,13 @@ class HttpOutboxTransportTest {
                 transport(server, () -> "token").publish(ENVELOPE);
             }
         }
-        try (var server = server(408, exchange -> { })) {
-            assertThatThrownBy(() -> transport(server, () -> "token").publish(ENVELOPE))
-                    .isInstanceOf(TransportException.class)
-                    .isNotInstanceOf(NonRetryableTransportException.class);
+        for (var status : new int[] {401, 403, 404, 408, 429}) {
+            try (var server = server(status, exchange -> { })) {
+                assertThatThrownBy(() -> transport(server, () -> "token").publish(ENVELOPE))
+                        .as("status %s must be retryable", status)
+                        .isInstanceOf(TransportException.class)
+                        .isNotInstanceOf(NonRetryableTransportException.class);
+            }
         }
         try (var server = server(400, exchange -> { })) {
             assertThatThrownBy(() -> transport(server, () -> "token").publish(ENVELOPE))
@@ -101,6 +104,10 @@ class HttpOutboxTransportTest {
             assertThatThrownBy(() -> transport(server, () -> " ").publish(ENVELOPE))
                     .isInstanceOf(TransportException.class);
             assertThatThrownBy(() -> transport(server, () -> null).publish(ENVELOPE))
+                    .isInstanceOf(TransportException.class);
+            assertThatThrownBy(() -> transport(server, () -> {
+                throw new IllegalStateException("mint failed");
+            }).publish(ENVELOPE))
                     .isInstanceOf(TransportException.class);
         }
     }

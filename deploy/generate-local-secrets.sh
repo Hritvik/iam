@@ -58,7 +58,7 @@ IAM_RECONCILER_URL=jdbc:postgresql://postgres:5432/iam
 IAM_RECONCILER_USERNAME=iam_registration_reconciler
 IAM_RECONCILER_PASSWORD=${reconciler_credential}
 
-IAM_ISSUER=https://iam.localhost
+IAM_ISSUER=https://iam.example.test
 IAM_REGISTRATION_ENABLED=true
 IAM_FIXTURES_ENABLED=false
 IAM_MESSAGING_ENABLED=true
@@ -71,7 +71,7 @@ IAM_WORKLOAD_SIGNING_PUBLIC_KEY=${workload_public_material}
 IAM_WORKLOAD_ID=wl_localdevelopmentrelay01
 IAM_WORKLOAD_APP_ID=dutch-development
 IAM_WORKLOAD_CLIENT_ID=iam-relay
-IAM_WORKLOAD_AUDIENCE=https://ums.localhost/internal/v1/iam/events
+IAM_WORKLOAD_AUDIENCE=https://ums.example.test/internal/iam/events
 IAM_WORKLOAD_SCOPE=ums:onboarding:write
 
 IAM_CRYPTO_LOCAL_ENABLED=true

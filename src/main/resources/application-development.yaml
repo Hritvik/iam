@@ -25,7 +25,7 @@ management:
 
 iam:
   environment: development
-  issuer: ${IAM_ISSUER:https://iam.localhost}
+  issuer: ${IAM_ISSUER:https://iam.example.test}
   registration:
     dutch-development:
       enabled: ${IAM_REGISTRATION_ENABLED:false}
@@ -61,9 +61,9 @@ iam:
       password: ${IAM_RELAY_PASSWORD}
       transport:
         mode: ${IAM_RELAY_TRANSPORT:http}
-        endpoint: ${IAM_RELAY_ENDPOINT:}
+        endpoint: ${IAM_RELAY_ENDPOINT:https://ums.example.test/internal/iam/events}
         workload-id: ${IAM_WORKLOAD_ID:wl_localdevelopmentrelay01}
-        audience: ${IAM_WORKLOAD_AUDIENCE:https://ums.localhost/internal/v1/iam/events}
+        audience: ${IAM_WORKLOAD_AUDIENCE:https://ums.example.test/internal/iam/events}
         scope: ${IAM_WORKLOAD_SCOPE:ums:onboarding:write}
         connect-timeout-ms: ${IAM_RELAY_CONNECT_TIMEOUT_MS:2000}
         request-timeout-ms: ${IAM_RELAY_REQUEST_TIMEOUT_MS:5000}
@@ -72,7 +72,7 @@ iam:
         interval-ms: ${IAM_RELAY_INTERVAL_MS:5000}
   workload:
     enabled: ${IAM_WORKLOAD_ENABLED:false}
-    issuer: ${IAM_ISSUER:https://iam.localhost}
+    issuer: ${IAM_ISSUER:https://iam.example.test}
     lifetime-seconds: ${IAM_WORKLOAD_LIFETIME_SECONDS:300}
     skew-seconds: ${IAM_WORKLOAD_SKEW_SECONDS:30}
     signing:
@@ -87,8 +87,9 @@ iam:
         app-registration-id: ${IAM_WORKLOAD_APP_ID:dutch-development}
         client-id: ${IAM_WORKLOAD_CLIENT_ID:iam-relay}
         audiences:
-          - ${IAM_WORKLOAD_AUDIENCE:https://ums.localhost/internal/v1/iam/events}
+          - ${IAM_WORKLOAD_AUDIENCE:https://ums.example.test/internal/iam/events}
           - https://iam.distracted.invalid/internal/onboarding
         scopes:
           - ${IAM_WORKLOAD_SCOPE:ums:onboarding:write}
           - iam:onboarding:read
+        security-version: ${IAM_WORKLOAD_SECURITY_VERSION:1}

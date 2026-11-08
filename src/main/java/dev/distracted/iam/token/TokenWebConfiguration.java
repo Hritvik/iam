@@ -1,6 +1,6 @@
 package dev.distracted.iam.token;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
@@ -12,7 +12,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(name = "iam.token.enabled", havingValue = "true")
+@ConditionalOnExpression("${iam.token.enabled:false} or ${iam.workload.enabled:false}")
 public class TokenWebConfiguration {
     @Bean @Order(Ordered.HIGHEST_PRECEDENCE + 90)
     SecurityFilterChain jwksSecurityFilterChain(HttpSecurity http) throws Exception {

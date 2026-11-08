@@ -1,5 +1,6 @@
 package dev.distracted.iam.workload;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.nimbusds.jose.JOSEObjectType;
@@ -192,6 +193,46 @@ class WorkloadAccessTokenRejectionTest {
                 WORKLOAD_ID, APP_ID, null, List.of(AUDIENCE), List.of("iam:onboarding:read"));
         assertThatThrownBy(() -> issuer(properties(ISSUER, 300, List.of(noClient))))
                 .isInstanceOf(WorkloadAccessTokenException.class);
+    }
+
+    @Test
+    void rejectsASecurityVersionThatDoesNotMatchTheBinding() {
+        var v2Binding = new WorkloadIdentityProperties.Binding(
+                WORKLOAD_ID, APP_ID, CLIENT_ID, List.of(AUDIENCE), List.of("iam:onboarding:read"), 2);
+        var v2Properties = properties(ISSUER, 300, List.of(v2Binding));
+        var token = issuer(v2Properties).issue(WORKLOAD_ID, AUDIENCE, "iam:onboarding:read");
+
+        assertThatThrownBy(() -> verifier.verify(token, AUDIENCE, "iam:onboarding:read"))
+                .isInstanceOf(WorkloadAccessTokenException.class);
+        assertThat(new WorkloadAccessTokenVerifier(v2Properties, CLOCK)
+                .verify(token, AUDIENCE, "iam:onboarding:read").appRegistrationId())
+                .isEqualTo(APP_ID);
+    }
+
+    @Test
+    void rejectsInvalidBindingVersionsAndClaimTypes() throws Exception {
+        var zeroVersion = new WorkloadIdentityProperties.Binding(
+                WORKLOAD_ID, APP_ID, CLIENT_ID, List.of(AUDIENCE), List.of("iam:onboarding:read"), 0);
+        assertThatThrownBy(() -> issuer(properties(ISSUER, 300, List.of(zeroVersion))))
+                .isInstanceOf(WorkloadAccessTokenException.class);
+        assertThatThrownBy(() -> new WorkloadAccessTokenVerifier(
+                properties(ISSUER, 300, List.of(zeroVersion)), CLOCK))
+                .isInstanceOf(WorkloadAccessTokenException.class);
+
+        var stringVersion = validClaims();
+        stringVersion.put("security_version", "1");
+        assertThatThrownBy(() -> verifier.verify(signed(stringVersion, "at+jwt", KEY_ID), AUDIENCE,
+                "iam:onboarding:read")).isInstanceOf(WorkloadAccessTokenException.class);
+
+        var fractionalIat = validClaims();
+        fractionalIat.put("iat", 1.5);
+        assertThatThrownBy(() -> verifier.verify(signed(fractionalIat, "at+jwt", KEY_ID), AUDIENCE,
+                "iam:onboarding:read")).isInstanceOf(WorkloadAccessTokenException.class);
+
+        var trailingScope = validClaims();
+        trailingScope.put("scope", "iam:onboarding:read ");
+        assertThatThrownBy(() -> verifier.verify(signed(trailingScope, "at+jwt", KEY_ID), AUDIENCE,
+                "iam:onboarding:read")).isInstanceOf(WorkloadAccessTokenException.class);
     }
 
     private WorkloadAccessTokenIssuer issuer(WorkloadIdentityProperties configured) {

@@ -5,7 +5,7 @@ secret-backed cryptographic capabilities, and the pinned Dutch development app r
 Identity fixtures stay off: the deterministic fixture runner is a test surface, not part of this runtime.
 
 It is a **development** environment only. It uses locally generated key material. The listener serves
-HTTP and advertises `https://iam.localhost` as its issuer. Real issuer, TLS, key custody, outbox
+HTTP and advertises `https://iam.example.test` as its issuer. Real issuer, TLS, key custody, outbox
 transport and workload identity arrive in DEP-2…DEP-4.
 
 ## Prerequisites
@@ -103,7 +103,7 @@ docker compose down --volumes  # discard database data and role state
 - **No identity fixture data.** The deterministic fixture runner only activates for tests, so this
   runtime proves packaging and registration, not the identity flows.
 - **No workload identity.** DEP-3 owns snapshot authentication.
-- **No TLS or real issuer.** The issuer is `https://iam.localhost`; DEP-4 owns DNS, TLS and rotation.
+- **No TLS or real issuer.** The issuer is `https://iam.example.test`; DEP-4 owns DNS, TLS and rotation.
 - **No production operations.** DEP-6 owns backups, alerts, SLOs and release approval.
 
 ## Troubleshooting
@@ -139,9 +139,9 @@ To exercise outbound delivery, provide a consumer endpoint and enable the relay:
 ```bash
 # in .env
 IAM_RELAY_ENABLED=true
-IAM_RELAY_ENDPOINT=https://ums.localhost/internal/v1/iam/events
+IAM_RELAY_ENDPOINT=https://ums.example.test/internal/iam/events
 IAM_RELAY_SCHEDULE_ENABLED=true
-IAM_WORKLOAD_AUDIENCE=https://ums.localhost/internal/v1/iam/events
+IAM_WORKLOAD_AUDIENCE=https://ums.example.test/internal/iam/events
 IAM_WORKLOAD_SCOPE=ums:onboarding:write
 ```
 

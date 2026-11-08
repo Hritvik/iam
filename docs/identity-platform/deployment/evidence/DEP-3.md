@@ -49,7 +49,7 @@ Also observed with the runtime still healthy:
 ## Tests
 
 ```text
-unit tests         406 passed
+unit tests         411 passed
 integration tests  319 passed
 contract tests       8 passed
 ```
@@ -61,7 +61,12 @@ Focused coverage:
   wrong issuer, expired token, tampered signature, malformed compact, wrong header `typ`, unknown
   `kid`, human profile claims, duplicate/unsorted/oversized scope, non-canonical subject, invalid
   app/client, zero security version, future `iat`, over-long and expired `exp`.
-- Authenticator rejection of missing, non-bearer, empty, malformed and non-HTTP requests.
+- Authenticator rejection of missing, non-bearer, empty, malformed and non-HTTP requests; the Bearer
+  scheme is case-insensitive.
+- The platform JWKS at `/oauth2/jwks` contains the workload `kid`; `WorkloadJwksTest` asserts the
+  published key verifies an issued token and that a stale key does not.
+- `security_version` is bound to the workload binding: a token minted for version 2 is rejected by a
+  verifier expecting version 1.
 - Issuer rejection of invalid issuer forms, lifetimes, key material, key ids and binding shapes.
 - Contract validation of the new schemas and valid/invalid fixtures.
 
@@ -76,23 +81,24 @@ sha256                           f54829318161688314e26c4feb3f0f10faeaab966992639
 The bundle adds the workload token header and claims schemas, the conformance block, and the
 additive snapshot security alternative. It is reproducible with `./gradlew contractBundle`.
 
-The central pin at `portfolio-planning/contracts/http/iam.onboarding-snapshot.v1/v1/openapi.yaml`
-still shows mTLS only. Refreshing that copy and its registry hash needs an IAM commit first, because
-the registry records the provider commit that contains the artifact. The provider bundle above is
-ready; the pin refresh is the handoff step.
+The central pin was refreshed in `portfolio-planning` commit `d1737ed`: the artifact hash is
+`9f87d53aa9f795747f32787778ddcedfa0a120a02edc59ff0f5d39ce24554179` and the source commit is
+`b831ea5`. UMS re-pinned to that hash; the Dutch consumer pin is still on the previous hash and needs
+a re-pin request.
 
 ## Deliberate gaps
 
 - **No general workload token endpoint.** Tokens are minted inside IAM for registered bindings; the
   human `/oauth2/token` surface is unchanged.
-- **UMS cannot yet obtain a token for the snapshot pull.** The accepted decision uses the token for
-  IAM-to-UMS delivery; the pull path retains mTLS, which needs DEP-4's TLS listener and certificate
-  custody. A token-based pull would need a separate issuance decision (for example a narrow
-  `private_key_jwt` endpoint). This is tracked with `ums/IAM-RUNTIME-INGRESS`.
+- **UMS can accept delivery now, but the snapshot pull credential is still gated.** UMS exposes
+  `POST /internal/v1/iam/events` and accepts `workload_access`; its snapshot client reads a mounted
+  credential file. IAM does not yet export that file. The accepted decision keeps the pull path on
+  mTLS (DEP-4); a token-based pull would need a narrow issuance/export decision. Tracked with
+  `ums/IAM-RUNTIME-INGRESS`.
 - **Registrations are configuration.** The reviewed workload manifest path is a later change; runtime
   bindings are injected from secret-backed configuration.
 - **mTLS remains.** The OpenAPI lists both mechanisms; the token alternative is additive. The
-  portfolio owner accepted the token for delivery on 2026-11-08; UMS still has to implement
-  acceptance on its ingestion route.
+  portfolio owner accepted the token for delivery on 2026-11-08 and UMS has implemented acceptance on
+  its ingestion route.
 - **No replay store.** The snapshot route is read-only, so duplicate `jti` does not mutate state; a
   mutating workload route will need a replay cache.

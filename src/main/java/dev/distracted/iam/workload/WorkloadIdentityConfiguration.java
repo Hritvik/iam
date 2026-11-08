@@ -26,6 +26,12 @@ public class WorkloadIdentityConfiguration {
     }
 
     @Bean
+    WorkloadPublicKey workloadPublicKey(WorkloadIdentityProperties properties) {
+        var signing = properties.signing();
+        return new WorkloadPublicKey(WorkloadKeys.publicKey(signing.keyId(), signing.publicKey()));
+    }
+
+    @Bean
     WorkloadAccessTokenVerifier workloadAccessTokenVerifier(WorkloadIdentityProperties properties) {
         return new WorkloadAccessTokenVerifier(properties, Clock.systemUTC());
     }

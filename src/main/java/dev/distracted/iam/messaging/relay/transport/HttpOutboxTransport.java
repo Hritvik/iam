@@ -42,7 +42,12 @@ public final class HttpOutboxTransport implements OutboxTransport {
 
     @Override
     public void publish(OutboxEnvelope envelope) {
-        var token = tokens.token();
+        final String token;
+        try {
+            token = tokens.token();
+        } catch (RuntimeException exception) {
+            throw new TransportException(exception);
+        }
         if (token == null || token.isBlank()) {
             throw new TransportException();
         }
@@ -68,7 +73,7 @@ public final class HttpOutboxTransport implements OutboxTransport {
         if (status >= 200 && status < 300) {
             return;
         }
-        if (status == 408 || status == 429 || status >= 500) {
+        if (status == 401 || status == 403 || status == 404 || status == 408 || status == 429 || status >= 500) {
             throw new TransportException();
         }
         throw new NonRetryableTransportException();

@@ -32,7 +32,7 @@ public final class JwtWorkloadAuthenticator implements WorkloadAuthenticator {
             return Optional.empty();
         }
         var header = values.getFirst();
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (header == null || !header.regionMatches(true, 0, "Bearer ", 0, "Bearer ".length())) {
             return Optional.empty();
         }
         var token = header.substring("Bearer ".length());

@@ -65,6 +65,26 @@ final class WorkloadKeys {
         }
     }
 
+    static ECKey publicKey(String keyId, String publicKeyMaterial) {
+        var id = required(keyId, "workload_jwks_key_id_missing");
+        if (!KEY_ID.matcher(id).matches()) {
+            throw new WorkloadAccessTokenException("workload_jwks_key_id_invalid");
+        }
+        try {
+            var publicKey = (ECPublicKey) KeyFactory.getInstance("EC")
+                    .generatePublic(new X509EncodedKeySpec(decode(publicKeyMaterial)));
+            return new ECKey.Builder(Curve.P_256, publicKey)
+                    .keyID(id)
+                    .keyUse(KeyUse.SIGNATURE)
+                    .algorithm(JWSAlgorithm.ES256)
+                    .build();
+        } catch (WorkloadAccessTokenException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new WorkloadAccessTokenException("workload_jwks_key_invalid", exception);
+        }
+    }
+
     static String requireHttpsIssuer(String value) {
         try {
             var uri = URI.create(required(value, "workload_issuer_missing"));

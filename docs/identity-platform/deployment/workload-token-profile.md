@@ -18,8 +18,8 @@ outbox relay presents to a consumer. mTLS remains published and unchanged.
 | Lifetime | 60–900 seconds |
 | Confirmation key | none — workload tokens are not DPoP-bound |
 | Delegation | none — no `act`, no token exchange |
-| Signing key | the IAM ES256 access-token key set |
-| Trust bundle | the IAM JWKS (`/.well-known` metadata `jwks_uri`) |
+| Signing key | the workload ES256 key, published in the IAM platform JWKS |
+| Trust bundle | `https://<iam-issuer>/oauth2/jwks` (the platform JWKS) |
 
 ## Claims
 
@@ -40,7 +40,7 @@ rejected.
 | `subject_kind` | string | `workload` |
 | `scope` | string | space-separated, sorted, unique, each matching `^[a-z][a-z0-9:_-]{0,63}$` |
 | `app_id` | string | the owning app registration |
-| `security_version` | integer | positive; raised when the workload's authority changes |
+| `security_version` | integer | the binding's registered authority version; a resource rejects a mismatch |
 
 A workload token is invalid if it carries `cnf`, `acr`, `amr`, `auth_time`, `act`, a human subject,
 or any other claim.
@@ -62,11 +62,14 @@ non-enumerating 404; it never reveals which side was wrong.
 
 ## Key custody and rotation
 
-- The signing key is an ES256 (P-256) key held through the platform's key custody path. IAM signs
-  every token; a registration holds only public binding metadata. Workload-held keys become relevant
-  only if a later `private_key_jwt` endpoint is accepted; this profile does not require one.
+- The workload signing key is an ES256 (P-256) key held through the platform's key custody path.
+  Its public half is served from the platform JWKS at `/oauth2/jwks`, alongside any human
+  access-token keys. IAM signs every token; a registration holds only public binding metadata.
+  Workload-held keys become relevant only if a later `private_key_jwt` endpoint is accepted; this
+  profile does not require one.
 - The active key signs; published keys remain in the JWKS until every token they signed has expired.
-  Because the lifetime is at most 15 minutes, rotation needs only a short overlap.
+  Because the lifetime is at most 15 minutes, rotation needs only a short overlap. A new `kid` is
+  published alongside the old one before signing switches.
 - A compromised key is removed from the JWKS, which invalidates new verification immediately for any
   token signed by it; existing tokens are short-lived by design.
 - `kid` selection is exact. A token with an unknown `kid` is rejected even if another published key
@@ -74,7 +77,8 @@ non-enumerating 404; it never reveals which side was wrong.
 
 ## Resource acceptance
 
-A resource that accepts this profile must:
+A resource that accepts this profile must point its JWKS trust at `https://<iam-issuer>/oauth2/jwks`.
+It must:
 
 1. Read exactly one `Authorization: Bearer` header.
 2. Verify the ES256 signature with the key selected by `kid` from the IAM JWKS.
@@ -99,14 +103,15 @@ The token route requires `aud=https://iam.distracted.invalid/internal/onboarding
 
 ## Outbound event delivery
 
-IAM's relay presents this profile to the consumer's ingestion endpoint:
+IAM's relay presents this profile to the consumer's ingestion endpoint (`POST https://ums.example.test/internal/iam/events`):
 
 | Field | Development value |
 |---|---|
 | `app_id` | `dutch-development` |
 | `client_id` | `iam-relay` |
-| `aud` | the consumer ingestion audience |
+| `aud` | `https://ums.example.test/internal/iam/events` |
 | `scope` | `ums:onboarding:write` |
+| `security_version` | the registered binding version (1) |
 
 The consumer must accept `workload_access` v1 alongside `human_access` v1. It must not treat a
 workload token as a human caller: no user subject, no recent-authentication assurance, and no

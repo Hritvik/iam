@@ -43,6 +43,17 @@ class RelayRuntimeConfigurationTest {
     }
 
     @Test
+    void failsWhenTheRelayBindingIsNotRegisteredWithTheIssuer() {
+        when(issuer.issue(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString())).thenThrow(
+                new dev.distracted.iam.workload.WorkloadAccessTokenException("workload_unregistered"));
+        runner().run(context -> {
+            assertThat(context).hasFailed();
+            assertThat(context.getStartupFailure()).hasStackTraceContaining("relay_workload_binding_invalid");
+        });
+    }
+
+    @Test
     void failsWhenTheConsumerEndpointIsMissing() {
         runnerWithout("iam.messaging.relay.transport.endpoint").run(context -> {
             assertThat(context).hasFailed();
