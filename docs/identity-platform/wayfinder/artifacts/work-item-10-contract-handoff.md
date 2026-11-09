@@ -1,7 +1,7 @@
 # W-10 contract handoff — Dutch mapping and profile contracts
 
-Status: **complete and accepted in the Dutch repository** (see `/Users/hritvikdinkar/repositories/dutch/docs/wayfinder/w10/README.md`)
-Owner: Dutch (`/Users/hritvikdinkar/repositories/dutch`)
+Status: **complete and accepted in the Dutch repository** (see `~/repositories/dutch/docs/wayfinder/w10/README.md`)
+Owner: Dutch (`~/repositories/dutch`)
 IAM role: supply the read-only imported bundle and the accepted shapes; IAM must not author or edit Dutch
 contracts, and must not publish `iam.identity.verified.v1`.
 
@@ -54,7 +54,7 @@ The Dutch harness is `contracts/validate-contracts.mjs` with `npm test` / `npm r
 ## Verification
 
 ```bash
-cd /Users/hritvikdinkar/repositories/dutch/contracts
+cd ~/repositories/dutch/contracts
 npm test
 npm run validate
 ```

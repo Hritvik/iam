@@ -14,7 +14,7 @@ What vertical slices, dependency order, contract-first boundaries, migration str
 
 ### Canonical ownership and repositories
 
-- The shared Identity Platform is canonically owned and implemented in the dedicated `/Users/hritvikdinkar/repositories/iam` repository. It is a portfolio security platform serving Dutch, Midas, Jarvis, and future first-party apps; Dutch does not own its runtime or release lifecycle.
+- The shared Identity Platform is canonically owned and implemented in the dedicated `~/repositories/iam` repository. It is a portfolio security platform serving Dutch, Midas, Jarvis, and future first-party apps; Dutch does not own its runtime or release lifecycle.
 - The IAM repository owns the Java/Spring modular application, IAM database migrations, OAuth/OIDC metadata and conformance configuration, platform OpenAPI, IAM-produced event schemas/fixtures, App Registration manifest schema/registry, deployable artifacts, runbooks, and infrastructure integration points.
 - Dutch retains Dutch App Registration environment overlays/review requests, Dutch client integration, and the Dutch-owned UMS profile/mapping consumer. Midas, Jarvis, and later products own equivalent app integration and profiles rather than depending on Dutch UMS.
 - Published contracts have one source of truth and are consumed by pinned version. Repositories must not maintain independently edited copies. Distribution may use a contract package/registry or an automated verified export chosen during repository setup.

@@ -20,7 +20,7 @@ The proving journey starts from an isolated deterministic development/test ident
 
 - **Driving constraint:** Establish the canonical IAM implementation and first cross-service proving slice before more product integrations build against the Dutch prototype.
 - **Recorded boundary:** Foundation through Slice C only, replacing the legacy scaffold and deliberately porting useful prototype behavior; cloud decisions and later slices are excluded. See [scope boundary](artifacts/scope-boundary.md).
-- **Repository ownership:** IAM production code, migrations, and IAM contracts live in `/Users/hritvikdinkar/repositories/iam`. Dutch-owned UMS work remains in `/Users/hritvikdinkar/repositories/dutch/services/ums` and Dutch-owned contracts remain in `/Users/hritvikdinkar/repositories/dutch/contracts`; this plan names those changes but does not move their ownership.
+- **Repository ownership:** IAM production code, migrations, and IAM contracts live in `~/repositories/iam`. Dutch-owned UMS work remains in `~/repositories/dutch/services/ums` and Dutch-owned contracts remain in `~/repositories/dutch/contracts`; this plan names those changes but does not move their ownership.
 - **No cross-service persistence:** IAM and UMS keep separate databases, roles, migrations, transactions, and backups. They integrate only through published contracts, events, and the privileged app-scoped snapshot.
 - **No compatibility fiction:** There is no live account or consumer population. Correct App Subject semantics replace misleading prototype fields rather than receiving dual-read/dual-publish machinery.
 - **No external mutation:** Execution does not commit, push, publish to a remote registry, or choose a cloud provider without a separately authorized step.
