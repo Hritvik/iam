@@ -139,11 +139,14 @@ To exercise outbound delivery, provide a consumer endpoint and enable the relay:
 ```bash
 # in .env
 IAM_RELAY_ENABLED=true
-IAM_RELAY_ENDPOINT=https://ums.example.test/internal/iam/events
+IAM_RELAY_ENDPOINT=https://ums.example.test/internal/v1/iam/events
 IAM_RELAY_SCHEDULE_ENABLED=true
 IAM_WORKLOAD_AUDIENCE=https://ums.example.test/internal/iam/events
 IAM_WORKLOAD_SCOPE=ums:onboarding:write
 ```
+
+The endpoint is the HTTP route (`/internal/v1/iam/events`); the audience is the registered
+identifier (`/internal/iam/events`, no version segment). They are deliberately different.
 
 The relay mints a short-lived workload token, posts the published event envelope, acknowledges on
 2xx, retries 408/429/5xx, and quarantines other 4xx. Counters appear as

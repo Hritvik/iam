@@ -99,6 +99,18 @@ class HttpOutboxTransportTest {
     }
 
     @Test
+    void quarantinesAPoisonPayloadInsteadOfRetryingForever() throws Exception {
+        var poison = new OutboxEnvelope("evt_0123456789abcdef",
+                "iam.app-subject.onboarding-ready.v1", 1, Instant.parse("2026-11-08T00:00:00Z"),
+                "iam", "development", "APP_ONBOARDING", "act_0123456789abcdef", 1,
+                "cor_0123456789abcdef", null, "dutch-development", "{not json", "a".repeat(64));
+        try (var server = server(200, exchange -> { })) {
+            assertThatThrownBy(() -> transport(server, () -> "token").publish(poison))
+                    .isInstanceOf(NonRetryableTransportException.class);
+        }
+    }
+
+    @Test
     void refusesAnUnusableToken() throws Exception {
         try (var server = server(200, exchange -> { })) {
             assertThatThrownBy(() -> transport(server, () -> " ").publish(ENVELOPE))

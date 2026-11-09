@@ -58,7 +58,7 @@ services:
       IAM_RELAY_OWNER: ${IAM_RELAY_OWNER:-iam-relay-1}
       IAM_RELAY_PASSWORD: ${IAM_RELAY_PASSWORD:?run deploy/generate-local-secrets.sh first}
       IAM_RELAY_SCHEDULE_ENABLED: ${IAM_RELAY_SCHEDULE_ENABLED:-false}
-      IAM_RELAY_ENDPOINT: ${IAM_RELAY_ENDPOINT:-https://ums.example.test/internal/iam/events}
+      IAM_RELAY_ENDPOINT: ${IAM_RELAY_ENDPOINT:-https://ums.example.test/internal/v1/iam/events}
       IAM_RELAY_CONNECT_TIMEOUT_MS: ${IAM_RELAY_CONNECT_TIMEOUT_MS:-2000}
       IAM_RELAY_REQUEST_TIMEOUT_MS: ${IAM_RELAY_REQUEST_TIMEOUT_MS:-5000}
       IAM_RELAY_INTERVAL_MS: ${IAM_RELAY_INTERVAL_MS:-5000}

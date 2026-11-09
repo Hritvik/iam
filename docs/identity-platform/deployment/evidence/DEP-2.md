@@ -22,8 +22,9 @@ Wiring:
 - `iam.messaging.relay.transport.mode=http` selects the transport.
 - `iam.messaging.relay.transport.endpoint` is the consumer ingestion URL. The development defaults
   are the UMS-published values: issuer `https://iam.example.test`, endpoint
-  `https://ums.example.test/internal/iam/events`, audience
-  `https://ums.example.test/internal/iam/events`, scope `ums:onboarding:write`.
+  `https://ums.example.test/internal/v1/iam/events`, audience
+  `https://ums.example.test/internal/iam/events`, scope `ums:onboarding:write`. The endpoint is
+  the HTTP route; the audience is the registered identifier and deliberately omits `/v1`.
 - The relay binding is minted once at startup; an unregistered workload, audience or scope fails
   startup with `relay_workload_binding_invalid`, and a later mint failure is a retryable transport
   failure rather than an uncaught exception.
@@ -37,7 +38,7 @@ Wiring:
 ## Tests
 
 ```text
-unit tests         411 passed
+unit tests         413 passed
 integration tests  319 passed
 contract tests       8 passed
 ```
@@ -58,6 +59,12 @@ Focused coverage:
   connect/request timeouts are refused.
 - A fresh token is minted for every attempt: two attempts for the same event carry the same
   `Idempotency-Key` and different `jti` values.
+- A malformed stored payload is classified as a non-retryable poison event and quarantined instead
+  of being re-leased forever.
+- The shipped development defaults are pinned by `RelayDefaultsTest`: the HTTP endpoint includes
+  `/internal/v1/iam/events`, while the audience stays `/internal/iam/events`.
+- The event envelope correlation pattern and UMS's parser both accept `cor_…`; no correlation-format
+  change was needed.
 - Scheduler counters reflect claimed, published, acknowledged and quarantined outcomes, and a
   repository failure does not escape the scheduled drain.
 
@@ -77,8 +84,9 @@ quarantine with an audit fact; an operator requeue path is not implemented.
 
 ## Deliberate gaps
 
-- **No consumer endpoint exists yet.** UMS has no exposed IAM ingestion HTTP route, so the relay is
-  disabled in the development runtime and the transport is proven against a local HTTP receiver.
+- **The consumer route now exists.** UMS exposes `POST /internal/v1/iam/events` and accepts
+  `workload_access`; the relay remains disabled in the development runtime until the deployment
+  supplies the endpoint and enables it, and the transport is proven against a local HTTP receiver.
 - **One destination.** The endpoint is configured once; per-app destination routing is a later
   change.
 - **No relay UI.** Retry and quarantine state is visible through the existing outbox tables, the

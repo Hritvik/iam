@@ -49,7 +49,7 @@ Also observed with the runtime still healthy:
 ## Tests
 
 ```text
-unit tests         411 passed
+unit tests         413 passed
 integration tests  319 passed
 contract tests       8 passed
 ```

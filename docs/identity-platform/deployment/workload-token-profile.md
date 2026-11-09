@@ -103,7 +103,7 @@ The token route requires `aud=https://iam.distracted.invalid/internal/onboarding
 
 ## Outbound event delivery
 
-IAM's relay presents this profile to the consumer's ingestion endpoint (`POST https://ums.example.test/internal/iam/events`):
+IAM's relay presents this profile to the consumer's ingestion endpoint (`POST https://ums.example.test/internal/v1/iam/events`):
 
 | Field | Development value |
 |---|---|

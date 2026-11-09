@@ -61,7 +61,7 @@ iam:
       password: ${IAM_RELAY_PASSWORD}
       transport:
         mode: ${IAM_RELAY_TRANSPORT:http}
-        endpoint: ${IAM_RELAY_ENDPOINT:https://ums.example.test/internal/iam/events}
+        endpoint: ${IAM_RELAY_ENDPOINT:https://ums.example.test/internal/v1/iam/events}
         workload-id: ${IAM_WORKLOAD_ID:wl_localdevelopmentrelay01}
         audience: ${IAM_WORKLOAD_AUDIENCE:https://ums.example.test/internal/iam/events}
         scope: ${IAM_WORKLOAD_SCOPE:ums:onboarding:write}
