@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationToken;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import java.util.LinkedHashMap;
 
 final class DpopTokenRequestAuthenticationProvider implements AuthenticationProvider {
     private final TokenEndpointOrchestrator orchestrator;
@@ -26,12 +27,22 @@ final class DpopTokenRequestAuthenticationProvider implements AuthenticationProv
             var now = java.time.Instant.now();
             var token = new OAuth2AccessToken(OAuth2AccessToken.TokenType.DPOP, success.accessToken(), now,
                     now.plusSeconds(success.expiresIn()), java.util.Set.copyOf(java.util.List.of(success.scope().split(" "))));
-            var client = RegisteredClient.withId(request.command().clientId()).clientId(request.command().clientId())
-                    .clientAuthenticationMethod(ClientAuthenticationMethod.NONE)
-                    .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                    .redirectUri(request.command().redirectUri()).build();
-            return new OAuth2AccessTokenAuthenticationToken(client, request, token, null,
-                    java.util.Map.of("correlation_id", request.command().correlationId()));
+            var clientBuilder = RegisteredClient.withId(request.command().clientId())
+                    .clientId(request.command().clientId())
+                    .clientAuthenticationMethod(ClientAuthenticationMethod.NONE);
+            if (request.command().redirectUri() != null) {
+                clientBuilder.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                        .redirectUri(request.command().redirectUri());
+            }
+            if (request.command().refreshToken() != null) {
+                clientBuilder.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN);
+            }
+            var parameters = new LinkedHashMap<String, Object>();
+            parameters.put("correlation_id", request.command().correlationId());
+            if (success.refreshToken() != null) {
+                parameters.put("refresh_token", success.refreshToken());
+            }
+            return new OAuth2AccessTokenAuthenticationToken(clientBuilder.build(), request, token, null, parameters);
         } catch (DpopNonceRequiredException exception) {
             throw exception;
         } catch (dev.distracted.iam.dpop.DpopProofRejectedException exception) {

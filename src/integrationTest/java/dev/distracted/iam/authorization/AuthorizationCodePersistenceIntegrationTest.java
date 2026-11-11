@@ -396,11 +396,11 @@ class AuthorizationCodePersistenceIntegrationTest {
         var cleanUrl = databaseUrl("authorization_v6_clean");
         var upgradeUrl = databaseUrl("authorization_v6_upgrade");
         assertThat(Flyway.configure().dataSource(cleanUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
-                .load().migrate().migrationsExecuted).isEqualTo(13);
+                .load().migrate().migrationsExecuted).isEqualTo(14);
         assertThat(Flyway.configure().dataSource(upgradeUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
                 .target("5").load().migrate().migrationsExecuted).isEqualTo(5);
         assertThat(Flyway.configure().dataSource(upgradeUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
-                .load().migrate().migrationsExecuted).isEqualTo(8);
+                .load().migrate().migrationsExecuted).isEqualTo(9);
 
         assertThat(schemaSnapshot(cleanUrl)).isEqualTo(schemaSnapshot(upgradeUrl));
     }

@@ -38,6 +38,10 @@ public class DpopTokenEndpointSecurityConfiguration {
             body.put("expires_in", java.time.Duration.between(result.getAccessToken().getIssuedAt(),
                     result.getAccessToken().getExpiresAt()).toSeconds());
             body.put("scope", String.join(" ", result.getAccessToken().getScopes().stream().sorted().toList()));
+            var rotated = (String) result.getAdditionalParameters().get("refresh_token");
+            if (rotated != null) {
+                body.put("refresh_token", rotated);
+            }
             mapper.writeValue(response.getOutputStream(), body);
         });
         filter.setAuthenticationFailureHandler((request, response, exception) -> {

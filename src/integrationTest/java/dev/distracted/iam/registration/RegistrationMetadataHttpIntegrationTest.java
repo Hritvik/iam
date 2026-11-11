@@ -90,7 +90,7 @@ class RegistrationMetadataHttpIntegrationTest {
         var owner = owner();
         owner.execute("truncate app_activation,token_issuance_audit_fact,dpop_replay,dpop_nonce,app_subject,authorization_audit_fact,authorization_code,authorization_request,policy_activation_evidence,policy_grant_type,product_security_policy,resource_scope,"
                 + "resource_registration,client_pkce_method,client_grant_type,client_redirect_uri,client_registration,"
-                + "app_registration");
+                + "app_registration cascade");
         new JdbcRegistrationRegistry(reconcilerJdbc()).reconcile(new StrictRegistrationManifestValidator()
                 .validate(new ClasspathPinnedRegistrationSource().load()));
     }
@@ -147,7 +147,7 @@ class RegistrationMetadataHttpIntegrationTest {
     void absentOrAmbiguousRegistryReturnsSafeRetryableError() throws Exception {
         owner().execute("truncate app_activation,token_issuance_audit_fact,dpop_replay,dpop_nonce,app_subject,authorization_audit_fact,authorization_code,authorization_request,policy_activation_evidence,policy_grant_type,product_security_policy,resource_scope,"
                 + "resource_registration,client_pkce_method,client_grant_type,client_redirect_uri,client_registration,"
-                + "app_registration");
+                + "app_registration cascade");
         mvc.perform(get("/.well-known/oauth-protected-resource").header("X-Correlation-Id", "missing-db"))
                 .andExpect(status().isServiceUnavailable()).andExpect(header().string("Retry-After", "30"))
                 .andExpect(jsonPath("$.error.code").value("metadata_unavailable"))

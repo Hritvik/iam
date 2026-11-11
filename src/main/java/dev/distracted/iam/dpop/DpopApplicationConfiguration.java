@@ -3,6 +3,8 @@ package dev.distracted.iam.dpop;
 import dev.distracted.iam.activation.AppSubjectResolver;
 import dev.distracted.iam.activation.AppSubjectResolutionCommand;
 import dev.distracted.iam.authorization.AuthorizationCodeRedemption;
+import dev.distracted.iam.authorization.refresh.RefreshTokenMaterialGenerator;
+import dev.distracted.iam.authorization.refresh.RefreshTokenRepository;
 import dev.distracted.iam.dpop.adapter.jdbc.JdbcDpopStateStore;
 import dev.distracted.iam.identity.IdentityReference;
 import dev.distracted.iam.messaging.CorrelationId;
@@ -16,6 +18,7 @@ import dev.distracted.iam.token.HumanAccessTokenVerifier;
 import dev.distracted.iam.token.SecureAccessTokenMaterialGenerator;
 import java.time.Clock;
 import java.time.Duration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -89,7 +92,11 @@ public class DpopApplicationConfiguration {
             @Value("${iam.dpop.replay-retention:180s}") Duration replayRetention,
             @Value("${iam.dpop.proof-maximum-age-seconds:60}") int proofMaximumAgeSeconds,
             @Value("${iam.dpop.proof-maximum-future-skew-seconds:5}") int proofMaximumFutureSkewSeconds,
-            @Value("${iam.token.lifetime:300s}") Duration tokenLifetime) {
+            @Value("${iam.token.lifetime:300s}") Duration tokenLifetime,
+            ObjectProvider<RefreshTokenRepository> refreshTokens,
+            ObjectProvider<RefreshTokenMaterialGenerator> refreshMaterials,
+            @Value("${iam.refresh.absolute-lifetime:30d}") Duration refreshAbsoluteLifetime,
+            @Value("${iam.refresh.idle-timeout:7d}") Duration refreshIdleTimeout) {
         TokenSubjectResolver subjects = (authorization, correlation) -> subjectResolver.resolve(
                 new AppSubjectResolutionCommand(authorization.appRegistrationId(),
                         new IdentityReference(authorization.humanIdentityId()), new CorrelationId(correlation)));
@@ -98,7 +105,9 @@ public class DpopApplicationConfiguration {
                 new SpringTransactionRunner(new TransactionTemplate(transactionManager)), limiter, target,
                 nonceLifetime,
                 java.time.Duration.ofSeconds(replayRetentionSeconds(replayRetention, proofMaximumAgeSeconds,
-                        proofMaximumFutureSkewSeconds)), tokenLifetime);
+                        proofMaximumFutureSkewSeconds)), tokenLifetime,
+                refreshTokens.getIfAvailable(), refreshMaterials.getIfAvailable(),
+                refreshAbsoluteLifetime, refreshIdleTimeout);
     }
 
     @Configuration(proxyBeanMethods = false)

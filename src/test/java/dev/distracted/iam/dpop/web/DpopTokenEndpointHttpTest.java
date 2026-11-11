@@ -61,6 +61,19 @@ class DpopTokenEndpointHttpTest {
                 .andExpect(jsonPath("$.id_token").doesNotExist());
     }
 
+    @Test void returnsTheRotatedRefreshTokenForTheRefreshGrant() throws Exception {
+        mvc.perform(post("/oauth2/token").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("grant_type", "refresh_token")
+                        .param("refresh_token", "a".repeat(43))
+                        .param("client_id", "dutch-mobile")
+                        .header("DPoP", "refresh.proof.compact")
+                        .header("X-Correlation-ID", "cor_abcdefghijklmnop"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.access_token").value("compact.access.token"))
+                .andExpect(jsonPath("$.refresh_token").value("refresh_" + "a".repeat(43)))
+                .andExpect(jsonPath("$.id_token").doesNotExist());
+    }
+
     @Test void mapsInvalidProofsToTheClosedDpopErrorWithoutInternalDetails() throws Exception {
         mvc.perform(valid("invalid.proof.compact"))
                 .andExpect(status().isBadRequest())
@@ -113,8 +126,12 @@ class DpopTokenEndpointHttpTest {
                 if (command.dpopProof().startsWith("invalid")) {
                     throw new dev.distracted.iam.dpop.DpopProofRejectedException();
                 }
-                return command.dpopProof().startsWith("challenge")
-                        ? new TokenEndpointOutcome.Challenge("nonce_abcdefghijklmnopqrstuvwxyzABCDEFGH")
+                if (command.dpopProof().startsWith("challenge")) {
+                    return new TokenEndpointOutcome.Challenge("nonce_abcdefghijklmnopqrstuvwxyzABCDEFGH");
+                }
+                return command.dpopProof().startsWith("refresh")
+                        ? new TokenEndpointOutcome.Success("compact.access.token", 300, "member:read",
+                                "refresh_" + "a".repeat(43))
                         : new TokenEndpointOutcome.Success("compact.access.token", 300, "member:read");
             };
         }

@@ -42,8 +42,9 @@ public class RegistrationApplicationConfiguration {
     }
 
     @Bean RegistrationMetadata registrationMetadata(@Qualifier("registrationRegistry") RegistrationRegistry registry,
-                                                     @Value("${iam.issuer}") String issuer) {
-        return new RegistryRegistrationMetadata(registry, issuer);
+                                                     @Value("${iam.issuer}") String issuer,
+                                                     @Value("${iam.refresh.enabled:false}") boolean refreshEnabled) {
+        return new RegistryRegistrationMetadata(registry, issuer, refreshEnabled);
     }
 
     @Bean ApplicationRunner pinnedRegistrationReconciler(

@@ -22,8 +22,15 @@ public record AuthorizationServerMetadata(
     }
 
     public static AuthorizationServerMetadata of(String issuer) {
+        return of(issuer, false);
+    }
+
+    public static AuthorizationServerMetadata of(String issuer, boolean refreshEnabled) {
+        var grants = refreshEnabled
+                ? List.of("authorization_code", "refresh_token")
+                : List.of("authorization_code");
         return new AuthorizationServerMetadata(issuer, issuer + "/oauth2/authorize", issuer + "/oauth2/token",
-                issuer + "/oauth2/jwks", List.of("code"), List.of("authorization_code"), List.of("S256"),
+                issuer + "/oauth2/jwks", List.of("code"), grants, List.of("S256"),
                 List.of("none"), List.of("ES256"));
     }
 }

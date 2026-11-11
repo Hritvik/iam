@@ -70,6 +70,10 @@ iam:
       schedule:
         enabled: ${IAM_RELAY_SCHEDULE_ENABLED:false}
         interval-ms: ${IAM_RELAY_INTERVAL_MS:5000}
+  refresh:
+    enabled: ${IAM_REFRESH_ENABLED:false}
+    absolute-lifetime: ${IAM_REFRESH_ABSOLUTE_LIFETIME:30d}
+    idle-timeout: ${IAM_REFRESH_IDLE_TIMEOUT:7d}
   workload:
     enabled: ${IAM_WORKLOAD_ENABLED:false}
     issuer: ${IAM_ISSUER:https://iam.example.test}

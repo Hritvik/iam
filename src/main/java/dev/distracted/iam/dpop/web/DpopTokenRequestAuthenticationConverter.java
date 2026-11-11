@@ -8,13 +8,18 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 
 final class DpopTokenRequestAuthenticationConverter implements AuthenticationConverter {
-    private static final Set<String> PARAMETERS = Set.of("grant_type", "code", "redirect_uri", "client_id", "code_verifier");
+    private static final Set<String> AUTHORIZATION_CODE_PARAMETERS =
+            Set.of("grant_type", "code", "redirect_uri", "client_id", "code_verifier");
+    private static final Set<String> REFRESH_TOKEN_PARAMETERS =
+            Set.of("grant_type", "refresh_token", "client_id");
     private final int maximumRawCharacters;
     private final int maximumDecodedCharacters;
 
     DpopTokenRequestAuthenticationConverter(int maximumRawCharacters, int maximumDecodedCharacters) {
         if (maximumRawCharacters < 1024 || maximumRawCharacters > 16384 || maximumDecodedCharacters < 512
-                || maximumDecodedCharacters > maximumRawCharacters) throw new IllegalArgumentException("token limits invalid");
+                || maximumDecodedCharacters > maximumRawCharacters) {
+            throw new IllegalArgumentException("token limits invalid");
+        }
         this.maximumRawCharacters = maximumRawCharacters;
         this.maximumDecodedCharacters = maximumDecodedCharacters;
     }
@@ -24,9 +29,11 @@ final class DpopTokenRequestAuthenticationConverter implements AuthenticationCon
                 || request.getContentType() == null
                 || !request.getContentType().startsWith("application/x-www-form-urlencoded")
                 || request.getContentLengthLong() > maximumRawCharacters
-                || request.getHeader("Authorization") != null
-                || !PARAMETERS.equals(request.getParameterMap().keySet())) throw invalid("invalid_request");
-        var decoded = request.getParameterMap().entrySet().stream()
+                || request.getHeader("Authorization") != null) {
+            throw invalid("invalid_request");
+        }
+        var parameters = request.getParameterMap();
+        var decoded = parameters.entrySet().stream()
                 .mapToInt(entry -> entry.getKey().length() + java.util.Arrays.stream(entry.getValue())
                         .mapToInt(String::length).sum()).sum();
         if (decoded > maximumDecodedCharacters) throw invalid("invalid_request");
@@ -35,16 +42,32 @@ final class DpopTokenRequestAuthenticationConverter implements AuthenticationCon
             throw invalid("invalid_dpop_proof");
         }
         var grant = one(request, "grant_type");
-        if (!"authorization_code".equals(grant)) throw invalid("invalid_request");
         var correlation = correlationId();
-        return new DpopTokenRequestAuthenticationToken(new TokenEndpointCommand(grant, one(request, "code"),
-                one(request, "redirect_uri"), one(request, "client_id"), one(request, "code_verifier"),
-                proofs.getFirst(), correlation, trustedNetworkContext(request)));
+        if ("authorization_code".equals(grant)) {
+            if (!AUTHORIZATION_CODE_PARAMETERS.equals(parameters.keySet())) throw invalid("invalid_request");
+            return token(new TokenEndpointCommand(grant, one(request, "code"), one(request, "redirect_uri"),
+                    one(request, "client_id"), one(request, "code_verifier"), proofs.getFirst(), correlation,
+                    trustedNetworkContext(request)));
+        }
+        if ("refresh_token".equals(grant)) {
+            if (!REFRESH_TOKEN_PARAMETERS.equals(parameters.keySet())) throw invalid("invalid_request");
+            var rotated = one(request, "refresh_token");
+            if (!rotated.matches("^[A-Za-z0-9_-]{43,128}$")) throw invalid("invalid_request");
+            return token(new TokenEndpointCommand(grant, null, null, one(request, "client_id"), null,
+                    proofs.getFirst(), correlation, trustedNetworkContext(request), rotated));
+        }
+        throw invalid("invalid_request");
+    }
+
+    private static DpopTokenRequestAuthenticationToken token(TokenEndpointCommand command) {
+        return new DpopTokenRequestAuthenticationToken(command);
     }
 
     private static String one(HttpServletRequest request, String name) {
         var values = request.getParameterValues(name);
-        if (values == null || values.length != 1 || values[0] == null || values[0].isBlank()) throw invalid("invalid_request");
+        if (values == null || values.length != 1 || values[0] == null || values[0].isBlank()) {
+            throw invalid("invalid_request");
+        }
         return values[0];
     }
 
@@ -64,7 +87,8 @@ final class DpopTokenRequestAuthenticationConverter implements AuthenticationCon
 
     private static String correlationId() {
         var value = org.slf4j.MDC.get(dev.distracted.iam.platform.http.CorrelationIdFilter.MDC_KEY);
-        var candidate = value == null || value.isBlank() ? "cor_" + java.util.UUID.randomUUID().toString().replace("-", "")
+        var candidate = value == null || value.isBlank()
+                ? "cor_" + java.util.UUID.randomUUID().toString().replace("-", "")
                 : value.startsWith("cor_") ? value : "cor_" + value;
         return CORRELATION.matcher(candidate).matches() ? candidate
                 : "cor_" + java.util.UUID.randomUUID().toString().replace("-", "");

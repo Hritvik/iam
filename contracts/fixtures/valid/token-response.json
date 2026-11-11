@@ -1,1 +1,1 @@
-{"schema":"https://contracts.distracted.dev/iam/oauth/token-response.schema.json","instance":{"access_token":"example.header.signature","token_type":"DPoP","expires_in":300,"scope":"member:read"}}
+{"schema":"https://contracts.distracted.dev/iam/oauth/token-response.schema.json","instance":{"access_token":"example.header.signature","token_type":"DPoP","expires_in":300,"scope":"member:read","refresh_token":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}}

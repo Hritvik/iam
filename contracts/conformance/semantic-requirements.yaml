@@ -43,7 +43,7 @@ token:
       - proof jti values are canonical unpadded base64url-compatible strings of 22 to 128 characters
       - the proof contains a fresh single-use nonce and contains no ath claim
       - the issued access token cnf.jkt equals the RFC 7638 thumbprint of the proof JWK
-      - a successful response has token_type DPoP and contains neither refresh_token nor id_token
+      - a successful response has token_type DPoP and contains no id_token; refresh_token appears only for the native refresh grant
       - OAuth and DPoP errors use only the closed error and description pairs
     verification: Token endpoint tests must prove nonce challenge, exact proof binding, replay rejection, and closed success and error bodies before authorization state commits.
 registration:

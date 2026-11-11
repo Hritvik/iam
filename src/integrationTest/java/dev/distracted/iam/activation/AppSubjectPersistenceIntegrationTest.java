@@ -454,7 +454,7 @@ class AppSubjectPersistenceIntegrationTest {
         var cleanUrl = databaseUrl("app_subject_v7_clean");
         var upgradeUrl = databaseUrl("app_subject_v7_upgrade");
         assertThat(Flyway.configure().dataSource(cleanUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
-                .load().migrate().migrationsExecuted).isEqualTo(13);
+                .load().migrate().migrationsExecuted).isEqualTo(14);
         assertThat(Flyway.configure().dataSource(upgradeUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
                 .target("6").load().migrate().migrationsExecuted).isEqualTo(6);
         var upgradeJdbc = new JdbcTemplate(new DriverManagerDataSource(upgradeUrl, POSTGRES.getUsername(),
@@ -467,7 +467,7 @@ class AppSubjectPersistenceIntegrationTest {
                 "cor_7123456789012345");
         var upgraded = Flyway.configure().dataSource(upgradeUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
                 .load();
-        assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(7);
+        assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(8);
         assertThat(upgraded.migrate().migrationsExecuted).isZero();
         assertThat(v7Snapshot(cleanUrl)).isEqualTo(v7Snapshot(upgradeUrl));
         assertThat(upgradeJdbc.queryForObject("select state from human_identity where identity_id=?", String.class,

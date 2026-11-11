@@ -1,1 +1,0 @@
-{"schema":"https://contracts.distracted.dev/iam/oauth/token-response.schema.json","assertedReason":"refresh_token","instance":{"access_token":"example.header.signature","token_type":"DPoP","expires_in":300,"scope":"member:read","refresh_token":"forbidden"}}

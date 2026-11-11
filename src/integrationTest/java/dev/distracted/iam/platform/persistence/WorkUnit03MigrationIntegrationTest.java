@@ -93,7 +93,7 @@ class WorkUnit03MigrationIntegrationTest {
                 .dataSource(retainedUrl, POSTGRES.getUsername(), POSTGRES.getPassword())
                 .load();
         // V2 through additive V9 must upgrade a retained V1 database without rewriting it.
-        assertThat(latest.migrate().migrationsExecuted).isEqualTo(12);
+        assertThat(latest.migrate().migrationsExecuted).isEqualTo(13);
         assertThat(latest.migrate().migrationsExecuted).isZero();
         try (var connection = DriverManager.getConnection(
                 retainedUrl, POSTGRES.getUsername(), POSTGRES.getPassword());

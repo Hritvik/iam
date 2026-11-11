@@ -6,15 +6,21 @@ import java.util.List;
 public final class RegistryRegistrationMetadata implements RegistrationMetadata {
     private final RegistrationRegistry registry;
     private final String issuer;
+    private final boolean refreshEnabled;
 
     public RegistryRegistrationMetadata(RegistrationRegistry registry, String issuer) {
+        this(registry, issuer, false);
+    }
+
+    public RegistryRegistrationMetadata(RegistrationRegistry registry, String issuer, boolean refreshEnabled) {
         this.registry = registry;
         this.issuer = validateIssuer(issuer);
+        this.refreshEnabled = refreshEnabled;
     }
 
     @Override public AuthorizationServerMetadata authorizationServer() {
         requireDutchRegistration();
-        return AuthorizationServerMetadata.of(issuer);
+        return AuthorizationServerMetadata.of(issuer, refreshEnabled);
     }
 
     @Override public ProtectedResourceMetadata protectedResource() {

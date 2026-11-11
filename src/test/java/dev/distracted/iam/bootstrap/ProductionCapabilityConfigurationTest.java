@@ -25,7 +25,8 @@ class ProductionCapabilityConfigurationTest {
         "iam.crypto.signer-algorithm=ES256",
         "iam.crypto.identifier-encryption-key-reference=encryption-key-reference",
         "iam.crypto.blind-index-key-reference=blind-index-key-reference",
-        "iam.crypto.challenge-digest-key-reference=challenge-digest-key-reference"
+        "iam.crypto.challenge-digest-key-reference=challenge-digest-key-reference",
+                    "iam.issuer=https://iam.staging.distracted.dev"
     };
 
     private final WebApplicationContextRunner contextRunner = new WebApplicationContextRunner()

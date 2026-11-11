@@ -47,6 +47,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
         "iam.dpop.persistence.enabled=true",
         "iam.authorization.enabled=true",
         "iam.token.enabled=true",
+        "iam.refresh.enabled=true",
         "iam.app-subject.enabled=true",
         "iam.registration.dutch-development.enabled=true",
         "iam.issuer=https://iam.distracted.invalid",
@@ -151,7 +152,7 @@ class DpopTokenEndpointIntegrationTest {
                 .andExpect(header().string("Cache-Control", "no-store"))
                 .andExpect(jsonPath("$.token_type").value("DPoP"))
                 .andExpect(jsonPath("$.access_token").isNotEmpty())
-                .andExpect(jsonPath("$.refresh_token").doesNotExist())
+                .andExpect(jsonPath("$.refresh_token").isNotEmpty())
                 .andExpect(jsonPath("$.id_token").doesNotExist());
         assertThat(codeRow("token_issuance_audit_fact")).isEqualTo(1);
 
@@ -184,6 +185,50 @@ class DpopTokenEndpointIntegrationTest {
                         .header("DPoP", proof("dup2_jti_abcdefghijklmnopqrs", null)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("invalid_dpop_proof"));
+    }
+
+    @Test
+    void refreshRotatesAndRejectsReuse() throws Exception {
+        var challenge = mvc.perform(tokenRequest(proof("refreshchallenge_jti_abcdefghij", null))).andReturn();
+        var nonce = challenge.getResponse().getHeader("DPoP-Nonce");
+        var issued = mvc.perform(tokenRequest(proof("refreshissue_jti_abcdefghijklmno", nonce)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.refresh_token").isNotEmpty())
+                .andReturn();
+        var mapper = new tools.jackson.databind.ObjectMapper();
+        var refresh = mapper.readTree(issued.getResponse().getContentAsString())
+                .required("refresh_token").textValue();
+
+        var refreshChallenge = mvc.perform(refreshRequest(proof("refreshrotate1_jti_abcdefghij", null), refresh))
+                .andReturn();
+        var refreshNonce = refreshChallenge.getResponse().getHeader("DPoP-Nonce");
+        var rotated = mvc.perform(refreshRequest(
+                        proof("refreshrotate2_jti_abcdefghijklmn", refreshNonce), refresh))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.access_token").isNotEmpty())
+                .andExpect(jsonPath("$.refresh_token").isNotEmpty())
+                .andExpect(jsonPath("$.id_token").doesNotExist())
+                .andReturn();
+        assertThat(mapper.readTree(rotated.getResponse().getContentAsString())
+                .required("refresh_token").textValue()).isNotEqualTo(refresh);
+
+        var reuseChallenge = mvc.perform(refreshRequest(proof("refreshreuse1_jti_abcdefghij", null), refresh))
+                .andReturn();
+        var reuseNonce = reuseChallenge.getResponse().getHeader("DPoP-Nonce");
+        mvc.perform(refreshRequest(proof("refreshreuse2_jti_abcdefghijklmn", reuseNonce), refresh))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("invalid_grant"));
+        assertThat(owner().queryForObject("select status from refresh_family", String.class)).isEqualTo("REVOKED");
+    }
+
+    private org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder refreshRequest(
+            String proof, String refresh) {
+        return post("/oauth2/token").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("grant_type", "refresh_token")
+                .param("refresh_token", refresh)
+                .param("client_id", "dutch-mobile")
+                .header("DPoP", proof)
+                .header("X-Correlation-ID", "cor_abcdefghijklmnop");
     }
 
     private org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder tokenRequest(String proof) {

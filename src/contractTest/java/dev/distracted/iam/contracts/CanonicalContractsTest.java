@@ -43,7 +43,7 @@ final class CanonicalContractsTest {
             builder -> builder.schemaMappers(mappers -> mappers.mapPrefix(BASE, CONTRACTS.toUri().toString())));
     private static final Set<String> FORBIDDEN_NAMES = Set.of(
             "identityid", "humanidentityid", "email", "phone", "credential", "authorizationcode",
-            "accesstoken", "refreshtoken", "sessionsecret", "devicefingerprint", "crossappsubject");
+            "accesstoken", "sessionsecret", "devicefingerprint", "crossappsubject");
     private static final Pattern EMAIL_VALUE = Pattern.compile("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
     private static final Pattern PHONE_VALUE = Pattern.compile("^\\+[1-9][0-9]{7,14}$");
     private static final Set<String> PUBLISHABLE_CONTRACT_PATHS = Set.of(
@@ -72,7 +72,7 @@ final class CanonicalContractsTest {
     @Test
     void catalogIsCompleteUniqueAndEveryEntryFullyParses() throws IOException {
         JsonNode catalog = catalog();
-        assertEquals("1.1.0", catalog.required("version").textValue());
+        assertEquals("1.2.0", catalog.required("version").textValue());
         Set<String> names = new HashSet<>();
         Set<String> paths = new HashSet<>();
         for (JsonNode contract : catalog.required("contracts")) {
@@ -113,7 +113,7 @@ final class CanonicalContractsTest {
         List<Path> valid = jsonFiles(CONTRACTS.resolve("fixtures/valid"));
         List<Path> invalid = jsonFiles(CONTRACTS.resolve("fixtures/invalid"));
         assertEquals(16, valid.size());
-        assertEquals(62, invalid.size());
+        assertEquals(61, invalid.size());
         for (Path fixture : valid) {
             JsonNode wrapper = JSON.readTree(fixture.toFile());
             List<String> failures = validateFixture(wrapper);

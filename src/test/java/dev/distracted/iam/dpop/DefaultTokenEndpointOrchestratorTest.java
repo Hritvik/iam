@@ -6,6 +6,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import dev.distracted.iam.activation.AppSubject;
 import dev.distracted.iam.activation.AppSubjectResolution;
 import dev.distracted.iam.authorization.ConsumedAuthorization;
+import dev.distracted.iam.authorization.refresh.RefreshFamilyIssue;
+import dev.distracted.iam.authorization.refresh.RefreshFamilyView;
+import dev.distracted.iam.authorization.refresh.RefreshIssueReceipt;
+import dev.distracted.iam.authorization.refresh.RefreshRotationCommand;
+import dev.distracted.iam.authorization.refresh.RefreshRotationOutcome;
+import dev.distracted.iam.authorization.refresh.RefreshRotationResult;
+import dev.distracted.iam.authorization.refresh.RefreshTokenRepository;
+import java.security.SecureRandom;
 import dev.distracted.iam.registration.RegistrationManifest;
 import java.time.Duration;
 import java.time.Instant;
@@ -82,6 +90,55 @@ class DefaultTokenEndpointOrchestratorTest {
         var unsupported = new TokenEndpointCommand("refresh_token", request.code(), request.redirectUri(),
                 request.clientId(), request.codeVerifier(), request.dpopProof(), request.correlationId());
         assertThatThrownBy(() -> service.exchange(unsupported)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test void authorizationCodeGrantAlsoIssuesARefreshFamily() {
+        var repository = new FakeRefreshRepository();
+        var service = serviceWithRefresh(new FakeState(true), command -> Optional.of(consumed()), repository);
+
+        var outcome = (TokenEndpointOutcome.Success) service.exchange(command("retry-proof"));
+
+        assertThat(outcome.refreshToken()).matches("^[A-Za-z0-9_-]{43}$");
+        assertThat(repository.issued).isNotNull();
+        assertThat(repository.issued.scope()).isEqualTo("member:read");
+    }
+
+    @Test void refreshGrantRotatesAndReturnsANewAccessAndRefreshToken() {
+        var repository = new FakeRefreshRepository();
+        var service = serviceWithRefresh(new FakeState(true), command -> Optional.empty(), repository);
+
+        var outcome = (TokenEndpointOutcome.Success) service.exchange(refreshCommand());
+
+        assertThat(outcome.accessToken()).isEqualTo("header.claims.signature");
+        assertThat(outcome.refreshToken()).matches("^[A-Za-z0-9_-]{43}$");
+        assertThat(repository.rotated).isNotNull();
+        assertThat(repository.rotated.securityVersion()).isEqualTo(1);
+    }
+
+    private static ConsumedAuthorization consumed() {
+        return new ConsumedAuthorization("arq_abcdefghijklmnopqrstuv", "dutch-development", "dutch-mobile",
+                "dutch-api", "https://api.dutch.example", "hid_abcdefghijklmnopqrstuv", "member:read",
+                new byte[32], new byte[32]);
+    }
+
+    private static TokenEndpointCommand refreshCommand() {
+        return new TokenEndpointCommand("refresh_token", null, null, "dutch-mobile", null,
+                "retry-proof", "cor_abcdefghijklmnop", "127.0.0.1", "a".repeat(43));
+    }
+
+    private static DefaultTokenEndpointOrchestrator serviceWithRefresh(FakeState state,
+            TokenAuthorizationRedeemer redeemer, RefreshTokenRepository repository) {
+        return new DefaultTokenEndpointOrchestrator(client -> Optional.of(registration()), proofVerifier(),
+                new FixedDigest(), new SecureDpopNonceGenerator(), state, redeemer,
+                (command, correlation) -> new AppSubjectResolution(new AppSubject("aps_abcdefghijklmnopqrstuvwx"),
+                        AppSubjectResolution.Outcome.EXISTING),
+                (command, subject, version, thumbprint, correlation, registration) -> "header.claims.signature",
+                new dev.distracted.iam.platform.persistence.TransactionRunner() {
+                    @Override public <T> T required(java.util.function.Supplier<T> work) { return work.get(); }
+                }, client -> true, TARGET, Duration.ofSeconds(120), Duration.ofSeconds(180),
+                Duration.ofSeconds(300), repository,
+                new dev.distracted.iam.authorization.refresh.SecureRefreshTokenMaterialGenerator(new SecureRandom()),
+                Duration.ofDays(30), Duration.ofDays(7));
     }
 
     private static DefaultTokenEndpointOrchestrator service(FakeState state,
@@ -169,6 +226,37 @@ class DefaultTokenEndpointOrchestratorTest {
         @Override public void appendIssuanceAudit(String auditId, String codeId, String app, String client,
                                                    String correlation) {
             audits++;
+        }
+    }
+
+    private static final class FakeRefreshRepository implements RefreshTokenRepository {
+        private static final String FAMILY = "rfm_" + "a".repeat(24);
+        RefreshFamilyIssue issued;
+        RefreshRotationCommand rotated;
+
+        @Override public java.util.Optional<RefreshFamilyView> findByTokenDigest(byte[] digest) {
+            return java.util.Optional.of(new RefreshFamilyView(FAMILY, "hid_abcdefghijklmnopqrstuv",
+                    "dutch-development", "dutch-mobile", "dutch-api", "https://api.dutch.example",
+                    "member:read", 1, "a".repeat(43), "ACTIVE"));
+        }
+
+        @Override public RefreshIssueReceipt issue(RefreshFamilyIssue issue) {
+            issued = issue;
+            var now = Instant.now();
+            return new RefreshIssueReceipt(now, now.plusSeconds(604800), now.plusSeconds(2592000), 1);
+        }
+
+        @Override public RefreshRotationResult rotate(RefreshRotationCommand command) {
+            rotated = command;
+            var now = Instant.now();
+            return new RefreshRotationResult(RefreshRotationOutcome.ROTATED, FAMILY, command.newTokenId(), 2,
+                    now, now.plusSeconds(604800), "dutch-development", "dutch-mobile", "dutch-api",
+                    "https://api.dutch.example", "hid_abcdefghijklmnopqrstuv", "member:read",
+                    now.plusSeconds(2592000));
+        }
+
+        @Override public boolean revokeFamily(String familyId, String reason, String correlationId) {
+            return true;
         }
     }
 }

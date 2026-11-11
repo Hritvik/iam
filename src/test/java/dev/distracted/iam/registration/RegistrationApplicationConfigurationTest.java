@@ -53,7 +53,7 @@ class RegistrationApplicationConfigurationTest {
         assertThat(configuration.pinnedRegistrationSource()).isInstanceOf(ClasspathPinnedRegistrationSource.class);
         assertThat(configuration.registrationManifestValidator()).isInstanceOf(StrictRegistrationManifestValidator.class);
         assertThat(configuration.registrationMetadata(registry(ReconciliationResult.CREATED),
-                "https://iam.distracted.invalid")).isInstanceOf(RegistryRegistrationMetadata.class);
+                "https://iam.distracted.invalid", false)).isInstanceOf(RegistryRegistrationMetadata.class);
     }
 
     @Test

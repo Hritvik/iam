@@ -465,7 +465,7 @@ class IdentityEvidencePersistenceIntegrationTest {
                 "vid_retainedV3Email00000001", "hid_retainedV3Identity000001", "EMAIL", 1,
                 new byte[] {1}, new byte[12], new byte[16], new byte[] {2}, new byte[12], new byte[16], 1);
         var latest = Flyway.configure().dataSource(url, POSTGRES.getUsername(), POSTGRES.getPassword()).load();
-        assertThat(latest.migrate().migrationsExecuted).isEqualTo(10);
+        assertThat(latest.migrate().migrationsExecuted).isEqualTo(11);
         assertThat(latest.migrate().migrationsExecuted).isZero();
         assertThat(retained.queryForObject("select count(*) from human_identity where identity_id=?", Integer.class,
                 "hid_retainedV3Identity000001")).isEqualTo(1);
